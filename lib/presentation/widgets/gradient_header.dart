@@ -4,14 +4,16 @@ import '../../core/theme/app_text_styles.dart';
 
 class GradientHeader extends StatelessWidget {
   final String title;
-  final Widget? child;
+  final String? subtitle;
   final Widget? trailing;
+  final Widget? child;
 
   const GradientHeader({
     super.key,
     required this.title,
-    this.child,
+    this.subtitle,
     this.trailing,
+    this.child,
   });
 
   @override
@@ -20,34 +22,89 @@ class GradientHeader extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
+          colors: [Color(0xFF4F8CFF), Color(0xFF2F6BFF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       child: SafeArea(
         bottom: false,
-        child: Column(
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: AppTextStyles.heading2.copyWith(
-                        color: AppColors.white,
-                        fontSize: 24,
-                      ),
-                    ),
+            // Radial light effect
+            Positioned(
+              top: -40,
+              right: -40,
+              child: Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.15),
+                      Colors.white.withValues(alpha: 0.0),
+                    ],
                   ),
-                  if (trailing != null) trailing!,
+                ),
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: AppTextStyles.heading2.copyWith(
+                                color: AppColors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            if (subtitle != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                subtitle!,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.white.withValues(alpha: 0.8),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      // Glassmorphism button
+                      if (trailing != null)
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: trailing,
+                        ),
+                    ],
+                  ),
+                  // Child content (balance card overlaps below)
+                  if (child != null) child!,
                 ],
               ),
             ),
-            if (child != null) child!,
           ],
         ),
       ),

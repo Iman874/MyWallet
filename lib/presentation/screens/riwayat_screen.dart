@@ -38,19 +38,13 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         children: [
           GradientHeader(
             title: 'Riwayat Transaksi',
-            trailing: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.calendar_today,
-                color: AppColors.white,
-                size: 20,
-              ),
+            subtitle: 'Lihat semua transaksimu',
+            trailing: const Icon(
+              Icons.calendar_today_outlined,
+              color: AppColors.white,
+              size: 22,
             ),
-            child: const SizedBox(height: 20),
+            child: const SizedBox(height: 8),
           ),
           _buildFilter(),
           Expanded(
