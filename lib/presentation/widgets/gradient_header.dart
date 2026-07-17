@@ -3,23 +3,24 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
 class GradientHeader extends StatelessWidget {
+  final double height;
   final String title;
   final String? subtitle;
   final Widget? trailing;
-  final Widget? child;
 
   const GradientHeader({
     super.key,
+    this.height = 200,
     required this.title,
     this.subtitle,
     this.trailing,
-    this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      height: height,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF4F8CFF), Color(0xFF2F6BFF)],
@@ -31,13 +32,13 @@ class GradientHeader extends StatelessWidget {
         bottom: false,
         child: Stack(
           children: [
-            // Radial light effect
+            // Radial glow effect
             Positioned(
-              top: -40,
-              right: -40,
+              top: -50,
+              right: -50,
               child: Container(
-                width: 180,
-                height: 180,
+                width: 200,
+                height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -52,56 +53,50 @@ class GradientHeader extends StatelessWidget {
             // Content
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: AppTextStyles.heading2.copyWith(
-                                color: AppColors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            if (subtitle != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                subtitle!,
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.white.withValues(alpha: 0.8),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTextStyles.heading2.copyWith(
+                            color: AppColors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                      // Glassmorphism button
-                      if (trailing != null)
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              width: 1,
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            subtitle!,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.white.withValues(alpha: 0.85),
+                              fontSize: 14,
                             ),
                           ),
-                          child: trailing,
-                        ),
-                    ],
+                        ],
+                      ],
+                    ),
                   ),
-                  // Child content (balance card overlaps below)
-                  if (child != null) child!,
+                  // Glassmorphism button
+                  if (trailing != null)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.25),
+                          width: 1,
+                        ),
+                      ),
+                      child: trailing,
+                    ),
                 ],
               ),
             ),

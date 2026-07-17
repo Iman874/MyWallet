@@ -83,9 +83,8 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
       body: Column(
         children: [
           GradientHeader(
+            height: 120,
             title: 'Tambah Transaksi',
-            trailing: const SizedBox(),
-            child: const SizedBox(height: 20),
           ),
           Expanded(
             child: Consumer<TransaksiProvider>(

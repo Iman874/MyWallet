@@ -37,6 +37,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       body: Column(
         children: [
           GradientHeader(
+            height: 140,
             title: 'Riwayat Transaksi',
             subtitle: 'Lihat semua transaksimu',
             trailing: const Icon(
@@ -44,7 +45,6 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
               color: AppColors.white,
               size: 22,
             ),
-            child: const SizedBox(height: 8),
           ),
           _buildFilter(),
           Expanded(
