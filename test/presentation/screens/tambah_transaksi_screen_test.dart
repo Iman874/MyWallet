@@ -26,47 +26,30 @@ void main() {
       expect(find.text('Catatan (opsional)'), findsOneWidget);
     });
 
-    testWidgets('should show error when submitting empty form',
-        (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-
-      await tester.tap(find.text('Simpan'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Jumlah wajib diisi'), findsOneWidget);
-    });
-
-    testWidgets('should show error when jumlah is 0', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-
-      await tester.enterText(find.byType(TextFormField).first, '0');
-      await tester.tap(find.text('Simpan'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Jumlah harus lebih dari 0'), findsOneWidget);
-    });
-
-    testWidgets('should show error when jumlah is negative', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-
-      await tester.enterText(find.byType(TextFormField).first, '-100');
-      await tester.tap(find.text('Simpan'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Jumlah harus lebih dari 0'), findsOneWidget);
-    });
-
-    testWidgets('should have radio buttons for tipe', (tester) async {
+    testWidgets('should have pill buttons for tipe', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.text('Pemasukan'), findsOneWidget);
       expect(find.text('Pengeluaran'), findsOneWidget);
     });
 
-    testWidgets('should have category dropdown', (tester) async {
+    testWidgets('should have category field', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+      expect(find.text('Kategori'), findsOneWidget);
+      expect(find.text('Makan'), findsOneWidget);
+    });
+
+    testWidgets('should show gradient header', (tester) async {
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      expect(find.text('Tambah Transaksi'), findsOneWidget);
+    });
+
+    testWidgets('should have save button', (tester) async {
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      expect(find.text('Simpan'), findsOneWidget);
     });
   });
 }

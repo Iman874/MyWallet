@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
+import '../widgets/gradient_header.dart';
+import '../widgets/modern_card.dart';
 import '../widgets/transaksi_list_item.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_decorations.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -28,11 +33,25 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Riwayat Transaksi'),
-      ),
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
+          GradientHeader(
+            title: 'Riwayat Transaksi',
+            trailing: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.calendar_today,
+                color: AppColors.white,
+                size: 20,
+              ),
+            ),
+            child: const SizedBox(height: 20),
+          ),
           _buildFilter(),
           Expanded(
             child: _buildContent(),
@@ -48,52 +67,138 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
 
-    return Container(
+    return ModernCard(
       padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Row(
         children: [
           Expanded(
-            child: DropdownButton<int>(
-              value: _selectedMonth,
-              isExpanded: true,
-              items: List.generate(12, (index) {
-                return DropdownMenuItem(
-                  value: index + 1,
-                  child: Text(months[index]),
+            child: _buildFilterDropdown(
+              label: 'Bulan',
+              value: months[_selectedMonth - 1],
+              icon: Icons.calendar_today,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => _buildMonthPicker(months),
                 );
-              }),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedMonth = value;
-                  });
-                  context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
-                }
               },
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
-            child: DropdownButton<int>(
-              value: _selectedYear,
-              isExpanded: true,
-              items: List.generate(5, (index) {
-                final year = DateTime.now().year - 2 + index;
-                return DropdownMenuItem(
-                  value: year,
-                  child: Text(year.toString()),
+            child: _buildFilterDropdown(
+              label: 'Tahun',
+              value: _selectedYear.toString(),
+              icon: Icons.calendar_today,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => _buildYearPicker(),
                 );
-              }),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedYear = value;
-                  });
-                  context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
-                }
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterDropdown({
+    required String label,
+    required String value,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.greyLight,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: AppTextStyles.caption),
+                  const SizedBox(height: 2),
+                  Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMonthPicker(List<String> months) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Pilih Bulan', style: AppTextStyles.heading4),
+          const SizedBox(height: 16),
+          ...List.generate(12, (index) {
+            final month = index + 1;
+            return ListTile(
+              title: Text(months[index]),
+              trailing: _selectedMonth == month
+                  ? const Icon(Icons.check_circle, color: AppColors.primary)
+                  : null,
+              onTap: () {
+                setState(() {
+                  _selectedMonth = month;
+                });
+                context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+                Navigator.pop(context);
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildYearPicker() {
+    final currentYear = DateTime.now().year;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Pilih Tahun', style: AppTextStyles.heading4),
+          const SizedBox(height: 16),
+          ...List.generate(5, (index) {
+            final year = currentYear - 2 + index;
+            return ListTile(
+              title: Text(year.toString()),
+              trailing: _selectedYear == year
+                  ? const Icon(Icons.check_circle, color: AppColors.primary)
+                  : null,
+              onTap: () {
+                setState(() {
+                  _selectedYear = year;
+                });
+                context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+                Navigator.pop(context);
+              },
+            );
+          }),
         ],
       ),
     );
@@ -107,24 +212,30 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         }
 
         if (provider.list.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.receipt_long,
-                    size: 80,
-                    color: Colors.grey,
+                    size: 100,
+                    color: AppColors.border,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Text(
-                    'Belum ada transaksi di bulan ini',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                    'Belum ada transaksi\ndi bulan ini',
+                    style: AppTextStyles.heading3.copyWith(
+                      color: AppColors.textSecondary,
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Coba pilih bulan atau tahun lainnya\nuntuk melihat riwayat transaksi.',
+                    style: AppTextStyles.bodySmall,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -133,6 +244,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         }
 
         return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           itemCount: provider.list.length,
           itemBuilder: (context, index) {
             return TransaksiListItem(
@@ -152,18 +264,23 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Catatan'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Edit Catatan', style: AppTextStyles.heading4),
         content: TextField(
           controller: catatanController,
           maxLines: 3,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'Masukkan catatan...',
+            hintStyle: AppTextStyles.input.copyWith(color: AppColors.grey),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+            child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -184,18 +301,16 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hapus Transaksi'),
-        content: const Text('Yakin ingin menghapus transaksi ini?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Hapus Transaksi', style: AppTextStyles.heading4),
+        content: Text('Yakin ingin menghapus transaksi ini?', style: AppTextStyles.body),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+            child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
+            style: AppDecorations.errorButtonStyle,
             onPressed: () {
               context.read<TransaksiProvider>().delete(id);
               Navigator.pop(context);

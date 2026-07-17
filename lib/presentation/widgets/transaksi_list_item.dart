@@ -25,41 +25,56 @@ class TransaksiListItem extends StatelessWidget {
 
     final isPemasukan = transaksi.tipe == TransaksiType.pemasukan;
     final color = isPemasukan ? AppColors.success : AppColors.error;
-    final icon = isPemasukan ? Icons.arrow_downward : Icons.arrow_upward;
+    final icon = isPemasukan ? Icons.arrow_upward : Icons.arrow_downward;
     final prefix = isPemasukan ? '+' : '-';
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
         onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: color, size: 20),
         ),
         title: Text(
           transaksi.kategori,
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
+          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 4),
             Text(
               DateFormat('dd MMM yyyy').format(transaksi.tanggal),
               style: AppTextStyles.caption,
             ),
-            if (transaksi.catatan != null && transaksi.catatan!.isNotEmpty)
+            if (transaksi.catatan != null && transaksi.catatan!.isNotEmpty) ...[
+              const SizedBox(height: 2),
               Text(
                 transaksi.catatan!,
                 style: AppTextStyles.caption.copyWith(
-                  color: AppColors.primaryDark,
+                  color: AppColors.textPrimary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+            ],
           ],
         ),
         trailing: Row(
@@ -70,7 +85,7 @@ class TransaksiListItem extends StatelessWidget {
               style: AppTextStyles.jumlah.copyWith(color: color),
             ),
             if (onDelete != null) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 20),
                 color: AppColors.error,

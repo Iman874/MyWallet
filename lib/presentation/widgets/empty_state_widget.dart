@@ -3,7 +3,16 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  const EmptyStateWidget({super.key});
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  const EmptyStateWidget({
+    super.key,
+    this.title = 'Belum ada transaksi',
+    this.subtitle = 'Mulai catat keuanganmu sekarang',
+    this.icon = Icons.account_balance_wallet_outlined,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,20 +22,30 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.account_balance_wallet_outlined,
-              size: 80,
-              color: AppColors.light,
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 60,
+                color: AppColors.primary.withValues(alpha: 0.5),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
-              'Belum ada transaksi',
-              style: AppTextStyles.heading3.copyWith(color: AppColors.grey),
+              title,
+              style: AppTextStyles.heading4.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Mulai catat keuanganmu sekarang',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+              subtitle,
+              style: AppTextStyles.bodySmall,
               textAlign: TextAlign.center,
             ),
           ],
