@@ -79,10 +79,13 @@ Untuk setiap perubahan non-trivial (fitur baru, perbaikan bug, refactor), ikuti 
 ### 1. Plan & analisis
 - Pahami scope: lihat PRD.md dan file terdampak.
 - Identifikasi layering: **UI (screen/widget)** → **ViewModel/Controller/Bloc** → **Repository** → **Database (SQLite)**. Jangan campur logic lintas layer dalam satu task.
-- Buat plan design di `plan/versions/` (buat folder bila belum ada) dengan format `plan-design-nama-fitur.md`. Section wajib: Latar Belakang, Tujuan, Scope (dikerjakan/tidak), Breakdown Task, Design Teknis (file terdampak, flow, skema DB), Dampak ke Sistem, Definition of Done.
+- Buat folder per versi di `plan/versions/` dengan format: `<version>-<nama-modul>/`. Contoh: `v0.1-foundation/`, `v0.2-dashboard-catat/`.
+- Di dalam setiap folder versi, buat:
+  - **Plan design**: `plan-design-<version>-<nama-modul>.md` dengan section wajib: Latar Belakang, Tujuan, Scope (dikerjakan/tidak), Breakdown Task, Design Teknis (file terdampak, flow, skema DB), Dampak ke Sistem, Definition of Done.
+  - **Task files**: `task1-<nama-task>.md`, `task2-<nama-task>.md`, dst. Setiap task mencakup 9 section: Judul, Deskripsi, Tujuan Teknis, Scope, Langkah Implementasi, Output yang Diharapkan, Dependencies, Acceptance Criteria, Estimasi. 1 task = 1 hasil jelas (1–4 jam).
 
 ### 2. Eksekusi
-- Kerjakan task berurutan sesuai dependency.
+- Kerjakan task berurutan sesuai dependency (task1 → task2 → ...).
 - Setiap task mencakup: UI, logic, database, validasi.
 - Pastikan empty state, error state, dan loading state terhandle.
 
@@ -92,12 +95,13 @@ Untuk setiap perubahan non-trivial (fitur baru, perbaikan bug, refactor), ikuti 
 - **Regression check**: pastikan fitur lain tidak rusak.
 
 ### 4. Setelah implementasi
-- Update status plan & task.
+- Update status plan & task (tandai selesai).
 - Update `.memori.txt` bila ada info penting.
 - Pastikan `pubspec.yaml` tidak corrupted.
 
 ### Definition of Done
 - Kode sesuai scope plan.
+- Semua task dalam versi selesai.
 - Flutter analyze bersih (tanpa error baru).
 - Semua acceptance criteria terpenuhi.
 - Empty/error/loading state terhandle.

@@ -1,0 +1,127 @@
+==================================================
+Tanggal : 2026-07-17
+Waktu   : 19:30
+Kategori: Feature
+
+Judul:
+v0.1 Foundation selesai - 6 task completed
+
+Detail:
+- Task 1: Flutter create + dependencies (sqflite, provider, intl, google_fonts)
+- Task 2: Model Transaksi entity (toMap, fromMap, copyWith)
+- Task 3: DatabaseHelper singleton (in-memory support untuk test)
+- Task 4: Repository + Provider (CRUD, saldo, ringkasan harian)
+- Task 5: Unit test - 18 tests pass
+- Task 6: Theme system (AppColors, AppTextStyles, AppTheme, AppDecorations)
+- Palet: #4274D9, #293681, #95CCDD, #D0E7E6, #4CAF50, #F44336
+- Font: Poppins via google_fonts
+
+Dampak:
+- Foundation siap untuk v0.2 (Dashboard + Form Transaksi)
+- flutter analyze: 0 error
+- flutter test: 18/18 pass
+==================================================
+==================================================
+Tanggal : 2026-07-17
+Waktu   : 19:15
+Kategori: Feature
+
+Judul:
+Eksekusi v0.1 Foundation — Task 1-4 Selesai, Task 5 In Progress
+
+Detail:
+- v0.1 Task 1 (Flutter Create & Dependencies): ✅ selesai — flutter create, pubspec.yaml dengan sqflite/provider/intl/google_fonts, struktur folder lib/
+- v0.1 Task 2 (Model Transaksi Entity): ✅ selesai — class Transaksi immutable dengan toMap/fromMap/copyWith, enum TransaksiType
+- v0.1 Task 3 (DatabaseHelper sqflite): ✅ selesai — singleton DatabaseHelper, CREATE TABLE transaksi, auto-increment id, index tanggal
+- v0.1 Task 4 (Repository & Provider): ✅ selesai — TransaksiRepository abstract, TransaksiRepositoryImpl (CRUD + getSaldo + getRingkasanHarian), TransaksiProvider ChangeNotifier
+- v0.1 Task 5 (Unit Test & Verify): 🔄 in_progress — test files ditulis (9 repo tests + 9 provider tests), ada 2 bug sedang diperbaiki:
+  1. AUTOINCREMENT SQL error — fixed by inlining CREATE TABLE SQL
+  2. Database singleton state leak — fix: in-memory DB per test via setDatabase() + resetInstance()
+- v0.1 Task 6 (Theme & Style System): 🔵 open — belum dikerjakan
+- `flutter analyze` bersih (0 error)
+- `flutter test` 3 pass, 16 fail (semua karena DB state, bukan logic error)
+
+Dampak:
+- Foundation layer sudah terbangun: model, database, repository, provider
+- Tinggal fix test isolation + buat theme system untuk selesai v0.1
+==================================================
+==================================================
+Tanggal : 2026-07-17
+Waktu   : 18:30
+Kategori: Feature
+
+Judul:
+Perbaikan Task UI dengan Theme System & Gambar
+
+Detail:
+- Menambahkan task6-theme-system.md di v0.1 untuk folder `lib/core/theme/`
+- Palet warna: #4274D9 (Primary), #293681 (Primary Dark), #95CCDD (Light), #D0E7E6 (Background), #4CAF50 (Success), #F44336 (Error)
+- Font: Poppins (Regular, Medium, SemiBold, Bold) via google_fonts
+- File theme: app_colors.dart, app_text_styles.dart, app_theme.dart, app_decorations.dart
+- Update semua task UI (v0.2 & v0.3) agar menggunakan AppColors, AppTextStyles, AppDecorations
+- Menambahkan instruksi gambar/ilustrasi untuk empty state (SVG/PNG di assets/images/)
+- Update task1-flutter-create-dependency.md untuk membuat folder theme dan assets
+
+Dampak:
+- Semua widget UI menggunakan theme yang terstandarisasi
+- Empty state menggunakan gambar ilustrasi yang konsisten
+- Palet warna dan font konsisten di seluruh aplikasi
+- Struktur folder: lib/core/theme/ untuk semua style
+==================================================
+==================================================
+Tanggal : 2026-07-17
+Waktu   : 17:01
+Kategori: Config
+
+Judul:
+Perbaikan struktur plan design sesuai format Monoframe
+
+Detail:
+- Struktur plan diubah mengikuti format Monoframe (folder per versi + task files)
+- Setiap versi punya folder sendiri: v0.1-foundation, v0.2-dashboard-catat, v0.3-riwayat-polish
+- Tiap folder berisi plan-design + task files (task1, task2, ...)
+- Total: 3 plan design + 11 task files (+ 1 task baru = 12 task)
+- File plan design gabungan sebelumnya dihapus
+
+Dampak:
+- Struktur plan konsisten dengan Monoframe
+- Task lebih terukur dan bisa dieksekusi berurutan
+==================================================
+==================================================
+Tanggal : 2026-07-17
+Waktu   : 08:35
+Kategori: Feature
+
+Judul:
+Plan Design Fase 1 MVP (v0.1 – v0.3) selesai
+
+Detail:
+- 3 versi incremental di folder terpisah:
+  - v0.1: Foundation & Database (5 task)
+  - v0.2: Dashboard + Catat Transaksi (3 task)
+  - v0.3: Riwayat Transaksi + Final Polish (3 task)
+- State management: Provider, Database: sqflite
+- Task per versi punya acceptance criteria + estimasi
+
+Dampak:
+- Siap mulai v0.1 task 1: `flutter create` + dependencies
+==================================================
+==================================================
+Tanggal : 2026-07-17
+Waktu   : 08:30
+Kategori: Architecture
+
+Judul:
+Inisialisasi project memory UangKu
+
+Detail:
+- Project: UangKu - Aplikasi pencatatan keuangan pribadi Flutter
+- Platform: Android & iOS (Mobile), offline-first
+- Framework: Flutter (Dart), SQLite lokal (sqflite)
+- State management: Provider
+- Fase saat ini: 1 (MVP) - Perencanaan (plan design sudah jadi di plan/versions/)
+
+Dampak:
+- File memory ini jadi referensi konteks lintas sesi
+- Eksekusi bertahap sesuai breakdown task per versi
+==================================================
