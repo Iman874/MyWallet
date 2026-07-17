@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'riwayat_screen.dart';
+import 'statistik_screen.dart';
+import 'kategori_screen.dart';
+import 'pengaturan_screen.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,9 +19,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const RiwayatScreen(),
-    const _PlaceholderScreen(title: 'Statistik', icon: Icons.bar_chart_rounded),
-    const _PlaceholderScreen(title: 'Kategori', icon: Icons.category_rounded),
-    const _PlaceholderScreen(title: 'Pengaturan', icon: Icons.settings_rounded),
+    const StatistikScreen(),
+    const KategoriScreen(),
+    const PengaturanScreen(),
   ];
 
   @override
@@ -133,77 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     : const Color(0xFF8B95A7),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  final IconData icon;
-
-  const _PlaceholderScreen({required this.title, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                title,
-                style: AppTextStyles.heading1.copyWith(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                'Coming soon',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        icon,
-                        size: 48,
-                        color: AppColors.primary.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Segera Hadir',
-                      style: AppTextStyles.heading4.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 80),
           ],
         ),
       ),

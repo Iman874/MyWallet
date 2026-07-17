@@ -1,5 +1,29 @@
 ==================================================
 Tanggal : 2026-07-17
+Waktu   : 21:00
+Kategori: Feature
+
+Judul:
+Plan v0.5 Statistik, Kategori CRUD, Pengaturan dibuat
+
+Detail:
+- 6 task untuk update 3 tab:
+  - Task 1: Update Database & Model Kategori (tambah tabel kategori)
+  - Task 2: Repository & Provider Kategori
+  - Task 3: Update Tab Kategori (CRUD)
+  - Task 4: Update Tab Statistik (chart pemasukan vs pengeluaran)
+  - Task 5: Update Tab Pengaturan (theme toggle light/dark)
+  - Task 6: Unit Test & Final Verify
+- Kategori default: Gaji, Makan, Transportasi, Hiburan, Lainnya
+- Theme: Light, Dark, System toggle
+
+Dampak:
+- Tab Statistik, Kategori, Pengaturan berfungsi penuh
+- Kategori bisa CRUD
+- Theme bisa diubah
+==================================================
+==================================================
+Tanggal : 2026-07-17
 Waktu   : 20:00
 Kategori: Feature
 
