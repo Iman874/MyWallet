@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
-import '../widgets/gradient_header.dart';
-import '../widgets/modern_card.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../widgets/empty_state_widget.dart';
 import '../../core/theme/app_colors.dart';
@@ -15,99 +13,124 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          // 1. Hero Header (fixed 200px)
-          GradientHeader(
-            height: 200,
-            title: 'UangKu',
-            subtitle: 'Kelola keuanganmu dengan mudah',
-            trailing: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.white,
-              size: 22,
-            ),
-          ),
+      backgroundColor: const Color(0xFFF5F7FB),
+      body: SafeArea(
+        child: Consumer<TransaksiProvider>(
+          builder: (context, provider, child) {
+            if (provider.isLoading && provider.list.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          // 2. Balance Card (floating, positioned at top: 120)
-          Positioned(
-            top: 120,
-            left: 24,
-            right: 24,
-            child: Consumer<TransaksiProvider>(
-              builder: (context, provider, child) {
-                return _buildSaldoCard(provider.saldo);
-              },
-            ),
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  // Header: Title + Notification
+                  _buildHeader(),
+                  const SizedBox(height: 24),
+                  // Balance Card
+                  _buildSaldoCard(provider.saldo),
+                  const SizedBox(height: 24),
+                  // Ringkasan Hari Ini
+                  _buildRingkasanHarian(
+                    provider.ringkasanHarian['pemasukan'] ?? 0,
+                    provider.ringkasanHarian['pengeluaran'] ?? 0,
+                  ),
+                  const SizedBox(height: 24),
+                  // Transaksi Terbaru
+                  _buildTransaksiTerbaru(context, provider),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4F8CFF), Color(0xFF2F6BFF)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2F6BFF).withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const TambahTransaksiScreen(),
+              ),
+            );
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(Icons.add, color: AppColors.white, size: 28),
+        ),
+      ),
+    );
+  }
 
-          // 3. Body (scrollable, starts AFTER balance card)
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 290),
-              child: Consumer<TransaksiProvider>(
-                builder: (context, provider, child) {
-                  return Column(
-                    children: [
-                      // 40px spacing after card
-                      const SizedBox(height: 40),
-                      _buildRingkasanHarian(
-                        provider.ringkasanHarian['pemasukan'] ?? 0,
-                        provider.ringkasanHarian['pengeluaran'] ?? 0,
-                      ),
-                      const SizedBox(height: 24),
-                      _buildTransaksiTerbaru(context, provider),
-                      const SizedBox(height: 100),
-                    ],
-                  );
-                },
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'UangKu',
+              style: AppTextStyles.heading1.copyWith(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ),
-        ],
-      ),
-      // 5. FAB with proper bottom spacing
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF4F8CFF), Color(0xFF2F6BFF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            const SizedBox(height: 4),
+            Text(
+              'Kelola keuanganmu dengan mudah',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
-            shape: BoxShape.circle,
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2F6BFF).withValues(alpha: 0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+                color: AppColors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: FloatingActionButton(
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const TambahTransaksiScreen(),
-                ),
-              );
-            },
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            child: const Icon(Icons.add, color: AppColors.white, size: 28),
+          child: const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.textPrimary,
+            size: 22,
           ),
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildSaldoCard(int saldo) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF4F8CFF), Color(0xFF2F6BFF)],
@@ -117,7 +140,7 @@ class DashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2F6BFF).withValues(alpha: 0.35),
+            color: const Color(0xFF2F6BFF).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -125,7 +148,7 @@ class DashboardScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Wallet icon background
+          // Wallet icon
           Positioned(
             right: 0,
             top: 0,
@@ -134,7 +157,7 @@ class DashboardScreen extends StatelessWidget {
               child: Icon(
                 Icons.account_balance_wallet,
                 color: AppColors.white,
-                size: 90,
+                size: 100,
               ),
             ),
           ),
@@ -149,24 +172,20 @@ class DashboardScreen extends StatelessWidget {
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 'Rp ${saldo.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
                 style: AppTextStyles.saldo.copyWith(
-                  fontSize: 34,
+                  fontSize: 36,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.white.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -195,35 +214,33 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildRingkasanHarian(int pemasukan, int pengeluaran) {
-    return ModernCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Ringkasan Hari Ini', style: AppTextStyles.heading4),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  label: 'Pemasukan',
-                  amount: pemasukan,
-                  icon: Icons.arrow_downward,
-                  color: AppColors.success,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Ringkasan Hari Ini', style: AppTextStyles.heading4),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildSummaryItem(
+                label: 'Pemasukan',
+                amount: pemasukan,
+                icon: Icons.arrow_downward,
+                color: AppColors.success,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildSummaryItem(
-                  label: 'Pengeluaran',
-                  amount: pengeluaran,
-                  icon: Icons.arrow_upward,
-                  color: AppColors.error,
-                ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildSummaryItem(
+                label: 'Pengeluaran',
+                amount: pengeluaran,
+                icon: Icons.arrow_upward,
+                color: AppColors.error,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -234,10 +251,17 @@ class DashboardScreen extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,18 +269,18 @@ class DashboardScreen extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: color, size: 14),
+                child: Icon(icon, color: color, size: 16),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(label, style: AppTextStyles.caption),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
             style: AppTextStyles.jumlah.copyWith(
@@ -274,28 +298,32 @@ class DashboardScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text('Transaksi Terbaru', style: AppTextStyles.heading4),
-        ),
-        const SizedBox(height: 12),
+        Text('Transaksi Terbaru', style: AppTextStyles.heading4),
+        const SizedBox(height: 16),
         if (provider.list.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
-            child: EmptyStateWidget(
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: AppColors.card,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const EmptyStateWidget(
               icon: Icons.account_balance_wallet_outlined,
               title: 'Belum ada transaksi',
               subtitle: 'Mulai catat keuanganmu sekarang',
             ),
           )
         else
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: provider.list.take(5).map(
-                (transaksi) => TransaksiListItem(transaksi: transaksi),
-              ).toList(),
-            ),
+          ...provider.list.take(5).map(
+            (transaksi) => TransaksiListItem(transaksi: transaksi),
           ),
       ],
     );

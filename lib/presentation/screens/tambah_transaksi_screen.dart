@@ -6,7 +6,6 @@ import '../../domain/entities/transaksi.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_decorations.dart';
-import '../widgets/gradient_header.dart';
 import '../widgets/pill_button.dart';
 import '../widgets/icon_prefix.dart';
 
@@ -79,42 +78,60 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          GradientHeader(
-            height: 120,
-            title: 'Tambah Transaksi',
-          ),
-          Expanded(
-            child: Consumer<TransaksiProvider>(
-              builder: (context, provider, child) {
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildJumlahField(),
-                        const SizedBox(height: 20),
-                        _buildTanggalField(),
-                        const SizedBox(height: 20),
-                        _buildKategoriField(),
-                        const SizedBox(height: 20),
-                        _buildTipeTransaksi(),
-                        const SizedBox(height: 20),
-                        _buildCatatanField(),
-                        const SizedBox(height: 24),
-                        _buildSimpanButton(provider),
-                      ],
+      backgroundColor: const Color(0xFFF5F7FB),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 12, 16, 0),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                  ),
+                  Text(
+                    'Tambah Transaksi',
+                    style: AppTextStyles.heading3.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ),
-        ],
+            // Form
+            Expanded(
+              child: Consumer<TransaksiProvider>(
+                builder: (context, provider, child) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildJumlahField(),
+                          const SizedBox(height: 20),
+                          _buildTanggalField(),
+                          const SizedBox(height: 20),
+                          _buildKategoriField(),
+                          const SizedBox(height: 20),
+                          _buildTipeTransaksi(),
+                          const SizedBox(height: 20),
+                          _buildCatatanField(),
+                          const SizedBox(height: 24),
+                          _buildSimpanButton(provider),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

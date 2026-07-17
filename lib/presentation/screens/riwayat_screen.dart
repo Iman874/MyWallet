@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
-import '../widgets/gradient_header.dart';
-import '../widgets/modern_card.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -33,24 +31,69 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          GradientHeader(
-            height: 140,
-            title: 'Riwayat Transaksi',
-            subtitle: 'Lihat semua transaksimu',
-            trailing: const Icon(
-              Icons.calendar_today_outlined,
-              color: AppColors.white,
-              size: 22,
+      backgroundColor: const Color(0xFFF5F7FB),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Riwayat',
+                        style: AppTextStyles.heading1.copyWith(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Lihat semua transaksimu',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.card,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.calendar_today_outlined,
+                      color: AppColors.textPrimary,
+                      size: 22,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          _buildFilter(),
-          Expanded(
-            child: _buildContent(),
-          ),
-        ],
+            const SizedBox(height: 20),
+            // Filter
+            _buildFilter(),
+            const SizedBox(height: 16),
+            // Content
+            Expanded(
+              child: _buildContent(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -61,9 +104,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
 
-    return ModernCard(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
           Expanded(
@@ -113,26 +155,33 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.greyLight,
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 20),
-            const SizedBox(width: 8),
+            Icon(icon, color: AppColors.primary, size: 18),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppTextStyles.caption),
+                  Text(label, style: AppTextStyles.caption.copyWith(fontSize: 11)),
                   const SizedBox(height: 2),
-                  Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+                  Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
                 ],
               ),
             ),
-            const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 20),
+            const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 18),
           ],
         ),
       ),
@@ -212,15 +261,22 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.receipt_long,
-                    size: 100,
-                    color: AppColors.border,
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.receipt_long,
+                      size: 60,
+                      color: AppColors.primary.withValues(alpha: 0.5),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     'Belum ada transaksi\ndi bulan ini',
-                    style: AppTextStyles.heading3.copyWith(
+                    style: AppTextStyles.heading4.copyWith(
                       color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,
@@ -238,7 +294,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           itemCount: provider.list.length,
           itemBuilder: (context, index) {
             return TransaksiListItem(
@@ -258,7 +314,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Edit Catatan', style: AppTextStyles.heading4),
         content: TextField(
           controller: catatanController,
@@ -295,7 +351,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Hapus Transaksi', style: AppTextStyles.heading4),
         content: Text('Yakin ingin menghapus transaksi ini?', style: AppTextStyles.body),
         actions: [
