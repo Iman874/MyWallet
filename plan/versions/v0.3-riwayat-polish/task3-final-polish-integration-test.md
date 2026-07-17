@@ -38,12 +38,14 @@ Final polish untuk seluruh Fase 1 MVP: perbaikan UI minor, handling edge cases, 
 Task 2 (edit/hapus)
 
 ## Acceptance Criteria
-- [ ] Integration test: catat pemasukan → dashboard update → catat pengeluaran → dashboard update → lihat riwayat → filter bulan → edit catatan → hapus → dashboard update
-- [ ] `flutter analyze` — 0 error 0 warning
-- [ ] `flutter test` — all pass
-- [ ] Semua empty/error/loading state terhandle dengan gambar ilustrasi
-- [ ] Semua screen menggunakan `AppColors`, `AppTextStyles`, `AppDecorations` dari folder theme
-- [ ] Tidak ada hardcode warna di luar folder `lib/core/theme/`
+- [x] Integration test: catat pemasukan → dashboard update → catat pengeluaran → dashboard update → lihat riwayat → filter bulan → edit catatan → hapus → dashboard update
+- [x] `flutter analyze` — 0 error 0 warning
+- [x] `flutter test` — all pass (30 tests)
+- [x] Semua empty/error/loading state terhandle dengan gambar ilustrasi
+- [x] Semua screen menggunakan `AppColors`, `AppTextStyles`, `AppDecorations` dari folder theme
+- [x] Tidak ada hardcode warna di luar folder `lib/core/theme/`
 
 ## Estimasi
 60 menit
+
+## Status: SELESAI

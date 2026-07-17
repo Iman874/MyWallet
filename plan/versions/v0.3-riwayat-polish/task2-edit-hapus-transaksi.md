@@ -37,14 +37,16 @@ Menambahkan fitur edit catatan dan hapus transaksi di halaman riwayat.
 Task 1 (Riwayat screen)
 
 ## Acceptance Criteria
-- [ ] Tap item → dialog edit muncul dengan catatan saat ini
-- [ ] Simpan edit → catatan terupdate
-- [ ] Icon delete → dialog konfirmasi muncul dengan warna yang benar
-- [ ] Konfirmasi hapus → transaksi hilang dari list
-- [ ] Saldo dashboard update setelah hapus
-- [ ] Batal hapus → tidak ada perubahan
-- [ ] Semua dialog menggunakan `AppColors` dan `AppTextStyles` dari folder theme
-- [ ] `flutter analyze` tanpa error baru
+- [x] Tap item → dialog edit muncul dengan catatan saat ini
+- [x] Simpan edit → catatan terupdate
+- [x] Icon delete → dialog konfirmasi muncul dengan warna yang benar
+- [x] Konfirmasi hapus → transaksi hilang dari list
+- [x] Saldo dashboard update setelah hapus
+- [x] Batal hapus → tidak ada perubahan
+- [x] Semua dialog menggunakan `AppColors` dan `AppTextStyles` dari folder theme
+- [x] `flutter analyze` tanpa error baru
 
 ## Estimasi
 45 menit
+
+## Status: SELESAI

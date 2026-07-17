@@ -39,12 +39,14 @@ Membangun halaman Riwayat Transaksi dengan ListView dan filter bulanan.
 v0.2 (dashboard & provider)
 
 ## Acceptance Criteria
-- [ ] List tampil dengan data benar
-- [ ] Filter bulanan bekerja
-- [ ] Empty state untuk bulan tanpa data dengan gambar ilustrasi
-- [ ] Loading indicator muncul saat query
-- [ ] Semua widget menggunakan `AppColors` dan `AppTextStyles` dari folder theme
-- [ ] `flutter analyze` tanpa error baru
+- [x] List tampil dengan data benar
+- [x] Filter bulanan bekerja
+- [x] Empty state untuk bulan tanpa data dengan gambar ilustrasi
+- [x] Loading indicator muncul saat query
+- [x] Semua widget menggunakan `AppColors` dan `AppTextStyles` dari folder theme
+- [x] `flutter analyze` tanpa error baru
 
 ## Estimasi
 60 menit
+
+## Status: SELESAI

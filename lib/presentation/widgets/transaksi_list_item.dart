@@ -6,8 +6,15 @@ import '../../domain/entities/transaksi.dart';
 
 class TransaksiListItem extends StatelessWidget {
   final Transaksi transaksi;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
-  const TransaksiListItem({super.key, required this.transaksi});
+  const TransaksiListItem({
+    super.key,
+    required this.transaksi,
+    this.onTap,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +31,7 @@ class TransaksiListItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
+        onTap: onTap,
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -36,13 +44,40 @@ class TransaksiListItem extends StatelessWidget {
           transaksi.kategori,
           style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
         ),
-        subtitle: Text(
-          DateFormat('dd MMM yyyy').format(transaksi.tanggal),
-          style: AppTextStyles.caption,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              DateFormat('dd MMM yyyy').format(transaksi.tanggal),
+              style: AppTextStyles.caption,
+            ),
+            if (transaksi.catatan != null && transaksi.catatan!.isNotEmpty)
+              Text(
+                transaksi.catatan!,
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.primaryDark,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
         ),
-        trailing: Text(
-          '$prefix${formatter.format(transaksi.jumlah)}',
-          style: AppTextStyles.jumlah.copyWith(color: color),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$prefix${formatter.format(transaksi.jumlah)}',
+              style: AppTextStyles.jumlah.copyWith(color: color),
+            ),
+            if (onDelete != null) ...[
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 20),
+                color: AppColors.error,
+                onPressed: onDelete,
+              ),
+            ],
+          ],
         ),
       ),
     );
