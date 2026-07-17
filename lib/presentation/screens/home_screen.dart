@@ -17,6 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const RiwayatScreen(),
+    const _PlaceholderScreen(title: 'Statistik', icon: Icons.bar_chart_rounded),
+    const _PlaceholderScreen(title: 'Kategori', icon: Icons.category_rounded),
+    const _PlaceholderScreen(title: 'Pengaturan', icon: Icons.settings_rounded),
   ];
 
   @override
@@ -34,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       height: 72,
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.08),
@@ -57,6 +60,24 @@ class _HomeScreenState extends State<HomeScreen> {
             activeIcon: Icons.receipt_long_rounded,
             label: 'Riwayat',
             index: 1,
+          ),
+          _buildNavItem(
+            icon: Icons.bar_chart_outlined,
+            activeIcon: Icons.bar_chart_rounded,
+            label: 'Statistik',
+            index: 2,
+          ),
+          _buildNavItem(
+            icon: Icons.category_outlined,
+            activeIcon: Icons.category_rounded,
+            label: 'Kategori',
+            index: 3,
+          ),
+          _buildNavItem(
+            icon: Icons.settings_outlined,
+            activeIcon: Icons.settings_rounded,
+            label: 'Pengaturan',
+            index: 4,
           ),
         ],
       ),
@@ -81,14 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFFEAF2FF)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? const Color(0xFFEAF2FF) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedScale(
@@ -100,20 +119,91 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: isSelected
                     ? const Color(0xFF4F7CFF)
                     : const Color(0xFF8B95A7),
-                size: 24,
+                size: 22,
               ),
             ),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTextStyles.body.copyWith(
-                  color: const Color(0xFF4F7CFF),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF4F7CFF)
+                    : const Color(0xFF8B95A7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlaceholderScreen extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const _PlaceholderScreen({required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FB),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                title,
+                style: AppTextStyles.heading1.copyWith(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                'Coming soon',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        size: 48,
+                        color: AppColors.primary.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Segera Hadir',
+                      style: AppTextStyles.heading4.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),
