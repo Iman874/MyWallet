@@ -47,14 +47,16 @@ Membangun halaman form untuk menambahkan transaksi pemasukan atau pengeluaran.
 Task 1 (Dashboard screen)
 
 ## Acceptance Criteria
-- [ ] Semua field berfungsi
-- [ ] Validasi jumlah > 0, tanggal tidak null
-- [ ] Simpan → provider.add() dipanggil → pop
-- [ ] Error state & loading state terhandle
-- [ ] Semua input menggunakan `AppDecorations.inputDecoration()`
-- [ ] Semua text menggunakan `AppTextStyles` dari folder theme
-- [ ] Icon kategori sesuai dengan material icons
-- [ ] `flutter analyze` tanpa error baru
+- [x] Semua field berfungsi
+- [x] Validasi jumlah > 0, tanggal tidak null
+- [x] Simpan → provider.add() dipanggil → pop
+- [x] Error state & loading state terhandle
+- [x] Semua input menggunakan `AppDecorations.inputDecoration()`
+- [x] Semua text menggunakan `AppTextStyles` dari folder theme
+- [x] Icon kategori sesuai dengan material icons
+- [x] `flutter analyze` tanpa error baru
 
 ## Estimasi
 60 menit
+
+## Status: SELESAI

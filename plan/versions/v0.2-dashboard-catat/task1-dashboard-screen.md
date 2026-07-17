@@ -45,12 +45,14 @@ Membangun halaman utama Dasbor dengan saldo, ringkasan harian, dan 5 transaksi t
 v0.1 (foundation)
 
 ## Acceptance Criteria
-- [ ] Saldo muncul dan sesuai dengan warna benar (hijau/merah)
-- [ ] Ringkasan harian dengan warna berbeda (pemasukan hijau, pengeluaran merah)
-- [ ] Transaksi terbaru maksimal 5 item
-- [ ] Empty state muncul dengan gambar ilustrasi jika 0 transaksi
-- [ ] Semua widget menggunakan `AppColors` dan `AppTextStyles` dari folder theme
-- [ ] `flutter analyze` tanpa error baru
+- [x] Saldo muncul dan sesuai dengan warna benar (hijau/merah)
+- [x] Ringkasan harian dengan warna berbeda (pemasukan hijau, pengeluaran merah)
+- [x] Transaksi terbaru maksimal 5 item
+- [x] Empty state muncul dengan gambar ilustrasi jika 0 transaksi
+- [x] Semua widget menggunakan `AppColors` dan `AppTextStyles` dari folder theme
+- [x] `flutter analyze` tanpa error baru
 
 ## Estimasi
 60 menit
+
+## Status: SELESAI

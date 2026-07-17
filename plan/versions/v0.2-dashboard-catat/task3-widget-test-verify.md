@@ -23,9 +23,11 @@ Menulis widget test untuk dashboard dan form tambah transaksi, memastikan semua 
 Task 1 & 2
 
 ## Acceptance Criteria
-- [ ] Widget test dashboard & form pass
-- [ ] `flutter analyze` — 0 error 0 warning
-- [ ] `flutter test` — all pass
+- [x] Widget test dashboard & form pass (12 tests)
+- [x] `flutter analyze` — 0 error 0 warning
+- [x] `flutter test` — all pass (30 tests total)
 
 ## Estimasi
 45 menit
+
+## Status: SELESAI

@@ -1,5 +1,26 @@
 ==================================================
 Tanggal : 2026-07-17
+Waktu   : 19:45
+Kategori: Feature
+
+Judul:
+v0.2 Dashboard & Catat Transaksi - Task 1 & 2 dibuat, flutter analyze errors
+
+Detail:
+- Task 1: Dashboard Screen — Consumer<TransaksiProvider>, SaldoCard, RingkasanHarianCard, TransaksiTerbaruList, EmptyStateWidget, FAB navigasi
+- Task 2: Form Tambah Transaksi — jumlah, tanggal (DatePicker), kategori (DropdownButton), tipe (Radio), catatan
+- Empty state pakai icon (`Icons.account_balance_wallet_outlined`) bukan PNG asset
+- Masih ada flutter analyze errors:
+  - DropdownButtonFormField type mismatch (Object vs String)
+  - Deprecated RadioListTile groupValue/onChanged
+  - Unused import intl
+
+Dampak:
+- Perlu fix flutter analyze errors sebelum lanjut ke Task 3 (widget test)
+- File baru: dashboard_screen.dart, tambah_transaksi_screen.dart, 5 widget files
+==================================================
+==================================================
+Tanggal : 2026-07-17
 Waktu   : 19:30
 Kategori: Feature
 
