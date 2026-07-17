@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
+import '../widgets/sticky_header.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -32,68 +33,32 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Riwayat',
-                        style: AppTextStyles.heading1.copyWith(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Lihat semua transaksimu',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.card,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.black.withValues(alpha: 0.04),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.calendar_today_outlined,
-                      color: AppColors.textPrimary,
-                      size: 22,
-                    ),
-                  ),
-                ],
+      body: Column(
+        children: [
+          // Sticky Header
+          StickyHeader(
+            title: 'Riwayat',
+            subtitle: 'Lihat semua transaksimu',
+            trailing: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F7FB),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(
+                Icons.calendar_today_outlined,
+                color: AppColors.textPrimary,
+                size: 22,
               ),
             ),
-            const SizedBox(height: 20),
-            // Filter
-            _buildFilter(),
-            const SizedBox(height: 16),
-            // Content
-            Expanded(
-              child: _buildContent(),
-            ),
-          ],
-        ),
+          ),
+          // Filter
+          _buildFilter(),
+          // Content
+          Expanded(
+            child: _buildContent(),
+          ),
+        ],
       ),
     );
   }
@@ -105,7 +70,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
       child: Row(
         children: [
           Expanded(
@@ -294,7 +259,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
           itemCount: provider.list.length,
           itemBuilder: (context, index) {
             return TransaksiListItem(

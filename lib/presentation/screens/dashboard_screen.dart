@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
+import '../widgets/sticky_header.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../widgets/empty_state_widget.dart';
 import '../../core/theme/app_colors.dart';
@@ -17,11 +18,20 @@ class DashboardScreen extends StatelessWidget {
       body: Column(
         children: [
           // Sticky Header
-          Container(
-            color: const Color(0xFFF5F7FB),
-            child: SafeArea(
-              bottom: false,
-              child: _buildHeader(context),
+          StickyHeader(
+            title: 'UangKu',
+            subtitle: 'Kelola keuanganmu dengan mudah',
+            trailing: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F7FB),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(
+                Icons.notifications_outlined,
+                color: AppColors.textPrimary,
+                size: 22,
+              ),
             ),
           ),
           // Scrollable Content
@@ -33,7 +43,7 @@ class DashboardScreen extends StatelessWidget {
                 }
 
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -87,61 +97,6 @@ class DashboardScreen extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'UangKu',
-                style: AppTextStyles.heading2.copyWith(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Kelola keuanganmu dengan mudah',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F7FB),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-              size: 22,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
