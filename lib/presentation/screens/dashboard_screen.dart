@@ -14,39 +14,44 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-      body: SafeArea(
-        child: Consumer<TransaksiProvider>(
-          builder: (context, provider, child) {
-            if (provider.isLoading && provider.list.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: Column(
+        children: [
+          // Sticky Header
+          Container(
+            color: const Color(0xFFF5F7FB),
+            child: SafeArea(
+              bottom: false,
+              child: _buildHeader(context),
+            ),
+          ),
+          // Scrollable Content
+          Expanded(
+            child: Consumer<TransaksiProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading && provider.list.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  // Header: Title + Notification
-                  _buildHeader(),
-                  const SizedBox(height: 24),
-                  // Balance Card
-                  _buildSaldoCard(provider.saldo),
-                  const SizedBox(height: 24),
-                  // Ringkasan Hari Ini
-                  _buildRingkasanHarian(
-                    provider.ringkasanHarian['pemasukan'] ?? 0,
-                    provider.ringkasanHarian['pengeluaran'] ?? 0,
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSaldoCard(provider.saldo),
+                      const SizedBox(height: 24),
+                      _buildRingkasanHarian(
+                        provider.ringkasanHarian['pemasukan'] ?? 0,
+                        provider.ringkasanHarian['pengeluaran'] ?? 0,
+                      ),
+                      const SizedBox(height: 24),
+                      _buildTransaksiTerbaru(context, provider),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  // Transaksi Terbaru
-                  _buildTransaksiTerbaru(context, provider),
-                  const SizedBox(height: 100),
-                ],
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 88),
@@ -85,49 +90,58 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'UangKu',
-              style: AppTextStyles.heading1.copyWith(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'UangKu',
+                style: AppTextStyles.heading2.copyWith(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Kelola keuanganmu dengan mudah',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+              const SizedBox(height: 4),
+              Text(
+                'Kelola keuanganmu dengan mudah',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
-          child: const Icon(
-            Icons.notifications_outlined,
-            color: AppColors.textPrimary,
-            size: 22,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F7FB),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.textPrimary,
+              size: 22,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -152,7 +166,6 @@ class DashboardScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Wallet icon
           Positioned(
             right: 0,
             top: 0,
@@ -165,7 +178,6 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
