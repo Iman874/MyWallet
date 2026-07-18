@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart';
+﻿import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -21,7 +21,7 @@ class DatabaseHelper {
       return await databaseFactory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
-          version: 4,
+          version: 5,
           onCreate: _createDB,
           onUpgrade: _onUpgrade,
         ),
@@ -31,7 +31,7 @@ class DatabaseHelper {
       final path = join(dbPath, filePath);
       return await openDatabase(
         path,
-        version: 4,
+        version: 5,
         onCreate: _createDB,
         onUpgrade: _onUpgrade,
       );
@@ -118,6 +118,9 @@ class DatabaseHelper {
         )
       ''');
     }
+    if (oldVersion < 5) {
+      await db.execute('ALTER TABLE kategori ADD COLUMN batas INTEGER');
+    }
   }
 
   Future _insertDefaultKategori(Database db) async {
@@ -166,3 +169,4 @@ class DatabaseHelper {
     _database = null;
   }
 }
+

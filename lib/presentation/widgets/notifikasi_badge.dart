@@ -26,8 +26,12 @@ class NotifikasiBadge extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
                 ),
                 child: Icon(
                   Icons.notifications_outlined,

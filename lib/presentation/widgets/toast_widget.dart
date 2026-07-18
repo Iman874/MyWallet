@@ -55,8 +55,8 @@ class ToastWidget extends StatelessWidget {
           border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.15),
-              blurRadius: 12,
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -96,6 +96,7 @@ class ToastWidget extends StatelessWidget {
                       style: AppTextStyles.bodyContext(context).copyWith(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
+                        decoration: TextDecoration.none,
                       ),
                     ),
                     if (toast.message.isNotEmpty) ...[
@@ -106,6 +107,7 @@ class ToastWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.captionContext(context).copyWith(
                           fontSize: 11,
+                          decoration: TextDecoration.none,
                         ),
                       ),
                     ],

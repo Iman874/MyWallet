@@ -28,30 +28,12 @@ class GradientHeader extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            // Radial glow
-            Positioned(
-              top: -40,
-              right: -40,
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      Colors.white.withValues(alpha: 0.12),
-                      Colors.white.withValues(alpha: 0.0),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Content
-            Padding(
+        child: SafeArea(
+          bottom: false,
+          child: Stack(
+            children: [
+              // Content
+              Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,

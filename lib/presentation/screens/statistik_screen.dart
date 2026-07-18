@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
 import '../providers/kategori_provider.dart';
 import '../widgets/sticky_header.dart';
+import '../widgets/pie_kategori_widget.dart';
+import '../widgets/budget_kategori_widget.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/format.dart';
@@ -429,6 +431,15 @@ class _StatistikScreenState extends State<StatistikScreen> {
               const SizedBox(height: 20),
               _buildChart(context, pemasukan, pengeluaran),
               const SizedBox(height: 20),
+              _buildPieKategori(context, filtered, kategoriProvider.list),
+              const SizedBox(height: 20),
+              BudgetKategoriWidget(
+                transaksi: filtered,
+                listKategori: kategoriProvider.list,
+                year: _selectedYear,
+                month: _selectedMonth,
+              ),
+              const SizedBox(height: 20),
               _buildDetailTransaksi(context, filtered, kategoriMap),
             ],
           ),
@@ -612,6 +623,17 @@ class _StatistikScreenState extends State<StatistikScreen> {
     );
   }
 
+
+  Widget _buildPieKategori(BuildContext context, List<Transaksi> list, List<Kategori> listKategori) {
+    final warnaKategori = <String, String>{};
+    for (final k in listKategori) {
+      warnaKategori[k.nama] = k.warna;
+    }
+    return PieKategoriWidget(
+      transaksi: list,
+      warnaKategori: warnaKategori,
+    );
+  }
   Widget _buildDetailTransaksi(BuildContext context, List<Transaksi> list, Map<String, Kategori> kategoriMap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -746,3 +768,6 @@ class _StatistikScreenState extends State<StatistikScreen> {
     );
   }
 }
+
+
+

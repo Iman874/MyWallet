@@ -1,3 +1,38 @@
+﻿==================================================
+Tanggal : 2026-07-18
+Waktu   : 17:30
+Kategori: Feature
+
+Judul:
+v0.9 Fitur Portofolio - Ekspor/Impor, Pie Chart, Budget Kategori
+
+Detail:
+- Dependency baru: fl_chart ^0.69.0, file_picker ^8.0.0 (pubspec.yaml)
+- DataExportService (lib/domain/services/data_export_service.dart):
+  - exportCsvTransaksi/CsvKategori, exportJson, importJson/CsvTransaksi/CsvKategori
+  - Upsert by id (update jika ada, insert jika baru) -> anti duplikat
+  - Validasi jumlah > 0 & tipe valid saat impor
+- ExportImportProvider (presentation/providers) + wiring di main.dart
+- PengaturanScreen: section "Data" (Ekspor CSV, Ekspor JSON, Impor) + toast
+- PieKategoriWidget (fl_chart) di StatistikScreen: komposisi pengeluaran + legend + total tengah
+- Budget kategori: field batas di entity Kategori (nullable)
+- Database version 4 -> 5, onUpgrade ALTER kategori ADD COLUMN batas INTEGER
+- KategoriRepositoryImpl insert/update sertakan batas
+- BudgetKategoriWidget: progress bar pemakaian bulan ini per kategori (StatistikScreen)
+- Dialog edit KategoriScreen: input batas budget (opsional)
+- NotifikasiService: cek budget kategori -> notifikasi tipe 'kategori' (tambah KategoriProvider dependency)
+- Unit test: test/domain/data_export_service_test.dart (6 test, fake repo)
+
+Dampak:
+- Data aman via backup CSV/JSON
+- Statistik lebih informatif (pie + budget)
+- Kontrol anggaran per kategori (bukan cuma global)
+- flutter analyze: 1 info pre-existing (sticky_header)
+- flutter test: 56/56 pass
+
+Catatan:
+- file_picker di Android modern pakai SAF, tidak perlu permission WRITE_EXTERNAL_STORAGE
+==================================================
 ==================================================
 Tanggal : 2026-07-18
 Waktu   : 23:45

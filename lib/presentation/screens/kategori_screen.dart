@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/kategori_provider.dart';
 import '../widgets/sticky_header.dart';
@@ -503,6 +504,9 @@ class _KategoriScreenState extends State<KategoriScreen> {
 
   void _showEditDialog(Kategori kategori) {
     final namaController = TextEditingController(text: kategori.nama);
+    final batasController = TextEditingController(
+      text: kategori.batas != null ? kategori.batas.toString() : '',
+    );
     String selectedIcon = kategori.icon;
     String selectedColor = kategori.warna;
     String selectedTipe = kategori.tipe;
@@ -670,6 +674,23 @@ class _KategoriScreenState extends State<KategoriScreen> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 12),
+                Text('Batas Budget (opsional)', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: batasController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: AppTextStyles.inputContext(context),
+                  decoration: InputDecoration(
+                    hintText: 'Kosongkan jika tanpa batas',
+                    hintStyle: AppTextStyles.bodyContext(context).copyWith(color: AppColors.grey),
+                    prefixText: 'Rp ',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -681,12 +702,14 @@ class _KategoriScreenState extends State<KategoriScreen> {
             ElevatedButton(
               onPressed: () {
                 if (namaController.text.isNotEmpty) {
+                  final batasText = batasController.text.trim();
                   context.read<KategoriProvider>().update(
                     kategori.copyWith(
                       nama: namaController.text,
                       icon: selectedIcon,
                       warna: selectedColor,
                       tipe: selectedTipe,
+                      batas: batasText.isEmpty ? null : int.tryParse(batasText),
                     ),
                   );
                   Navigator.pop(context);

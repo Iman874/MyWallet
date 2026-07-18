@@ -56,6 +56,12 @@ dependencies:
   # Loading Animation
   shimmer: ^3.0.0
 
+  # Charts (pie chart statistik)
+  fl_chart: ^0.69.0
+
+  # File picker (ekspor/impor data)
+  file_picker: ^8.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

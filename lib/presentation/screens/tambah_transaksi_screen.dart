@@ -129,6 +129,7 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
 
     final transaksiProvider = context.read<TransaksiProvider>();
     final batasProvider = context.read<BatasProvider>();
+    final kategoriProvider = context.read<KategoriProvider>();
     final notifikasiProvider = context.read<NotifikasiProvider>();
     final toastProvider = context.read<ToastProvider>();
 
@@ -149,6 +150,7 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
         final service = NotifikasiService(
           transaksiProvider: transaksiProvider,
           batasProvider: batasProvider,
+          kategoriProvider: kategoriProvider,
           notifikasiProvider: notifikasiProvider,
         );
         await service.cekDanBuatNotifikasi(transaksi);

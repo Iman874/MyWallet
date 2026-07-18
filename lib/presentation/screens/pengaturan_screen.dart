@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/batas_provider.dart';
+import '../providers/transaksi_provider.dart';
+import '../providers/kategori_provider.dart';
+import '../providers/export_import_provider.dart';
+import '../providers/toast_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -48,6 +52,10 @@ class PengaturanScreen extends StatelessWidget {
                   _buildSectionTitle(context, 'Batas Pemakaian'),
                   const SizedBox(height: 12),
                   _buildBatasSection(context),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle(context, 'Data'),
+                  const SizedBox(height: 12),
+                  _buildDataSection(context),
                   const SizedBox(height: 24),
                   _buildSectionTitle(context, 'Tentang'),
                   const SizedBox(height: 12),
@@ -514,6 +522,124 @@ class PengaturanScreen extends StatelessWidget {
       title: Text(title, style: AppTextStyles.bodyContext(context)),
       trailing: trailing ?? Icon(Icons.chevron_right, color: isDark ? Colors.grey : AppColors.textSecondary),
       onTap: onTap,
+    );
+  }
+
+  Widget _buildDataSection(BuildContext context) {
+    final exportImport = context.watch<ExportImportProvider>();
+    final toast = context.read<ToastProvider>();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildDataItem(
+            context: context,
+            icon: Icons.download_rounded,
+            iconColor: AppColors.primary,
+            title: 'Ekspor CSV',
+            subtitle: 'Simpan transaksi & kategori ke CSV',
+            isLoading: exportImport.isBusy,
+            onTap: () async {
+              await exportImport.exportCsv();
+              if (exportImport.message != null) {
+                if (exportImport.isError) {
+                  toast.showError('Ekspor', exportImport.message!);
+                } else {
+                  toast.showInfo('Ekspor', exportImport.message!);
+                }
+                exportImport.clearMessage();
+              }
+            },
+          ),
+          const Divider(height: 1, indent: 56),
+          _buildDataItem(
+            context: context,
+            icon: Icons.file_download_rounded,
+            iconColor: AppColors.success,
+            title: 'Ekspor JSON',
+            subtitle: 'Backup lengkap (transaksi + kategori)',
+            isLoading: exportImport.isBusy,
+            onTap: () async {
+              await exportImport.exportJson();
+              if (exportImport.message != null) {
+                if (exportImport.isError) {
+                  toast.showError('Ekspor', exportImport.message!);
+                } else {
+                  toast.showInfo('Ekspor', exportImport.message!);
+                }
+                exportImport.clearMessage();
+              }
+            },
+          ),
+          const Divider(height: 1, indent: 56),
+          _buildDataItem(
+            context: context,
+            icon: Icons.upload_rounded,
+            iconColor: AppColors.primaryLight,
+            title: 'Impor Data',
+            subtitle: 'Pulihkan dari file CSV / JSON',
+            isLoading: exportImport.isBusy,
+            onTap: () async {
+              final transaksiProvider = context.read<TransaksiProvider>();
+              final kategoriProvider = context.read<KategoriProvider>();
+              await exportImport.importData();
+              if (exportImport.message != null) {
+                if (exportImport.isError) {
+                  toast.showError('Impor', exportImport.message!);
+                } else {
+                  toast.showInfo('Impor', exportImport.message!);
+                }
+                exportImport.clearMessage();
+              }
+              transaksiProvider.loadAll();
+              kategoriProvider.loadAll();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataItem({
+    required BuildContext context,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required bool isLoading,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isDark ? iconColor.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Icon(icon, color: iconColor, size: 22),
+      ),
+      title: Text(title, style: AppTextStyles.bodyContext(context)),
+      subtitle: Text(subtitle, style: AppTextStyles.captionContext(context)),
+      trailing: Icon(Icons.chevron_right, color: isDark ? Colors.grey : AppColors.textSecondary),
+      onTap: isLoading ? null : onTap,
     );
   }
 }

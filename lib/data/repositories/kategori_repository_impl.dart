@@ -40,8 +40,8 @@ class KategoriRepositoryImpl implements KategoriRepository {
     final map = kategori.toMap();
     map.remove('id');
     return await _databaseHelper.rawInsert(
-      'INSERT INTO kategori (nama, icon, warna, isDefault, tipe) VALUES (?, ?, ?, ?, ?)',
-      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['tipe']],
+      'INSERT INTO kategori (nama, icon, warna, isDefault, tipe, batas) VALUES (?, ?, ?, ?, ?, ?)',
+      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['tipe'], map['batas']],
     );
   }
 
@@ -49,8 +49,8 @@ class KategoriRepositoryImpl implements KategoriRepository {
   Future<int> update(Kategori kategori) async {
     final map = kategori.toMap();
     return await _databaseHelper.rawUpdate(
-      'UPDATE kategori SET nama = ?, icon = ?, warna = ?, isDefault = ?, tipe = ? WHERE id = ?',
-      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['tipe'], map['id']],
+      'UPDATE kategori SET nama = ?, icon = ?, warna = ?, isDefault = ?, tipe = ?, batas = ? WHERE id = ?',
+      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['tipe'], map['batas'], map['id']],
     );
   }
 
