@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
-class PengaturanScreen extends StatefulWidget {
+class PengaturanScreen extends StatelessWidget {
   const PengaturanScreen({super.key});
 
   @override
-  State<PengaturanScreen> createState() => _PengaturanScreenState();
-}
-
-class _PengaturanScreenState extends State<PengaturanScreen> {
-  ThemeMode _themeMode = ThemeMode.system;
-
-  @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           StickyHeader(
@@ -25,12 +22,12 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
             trailing: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FB),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.settings_outlined,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 size: 22,
               ),
             ),
@@ -41,13 +38,13 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('Tampilan'),
+                  _buildSectionTitle(context, 'Tampilan'),
                   const SizedBox(height: 12),
-                  _buildThemeSection(),
+                  _buildThemeSection(context, themeProvider),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Tentang'),
+                  _buildSectionTitle(context, 'Tentang'),
                   const SizedBox(height: 12),
-                  _buildAboutSection(),
+                  _buildAboutSection(context),
                 ],
               ),
             ),
@@ -57,18 +54,25 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(title, style: AppTextStyles.heading4);
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: AppTextStyles.heading4.copyWith(
+        color: Theme.of(context).textTheme.bodyLarge?.color,
+      ),
+    );
   }
 
-  Widget _buildThemeSection() {
+  Widget _buildThemeSection(BuildContext context, ThemeProvider themeProvider) {
+    final currentMode = themeProvider.themeMode;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -77,27 +81,30 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
       child: Column(
         children: [
           _buildThemeOption(
+            context: context,
             title: 'Mode Terang',
             subtitle: 'Gunakan tema terang',
             icon: Icons.light_mode_rounded,
-            isSelected: _themeMode == ThemeMode.light,
-            onTap: () => _setThemeMode(ThemeMode.light),
+            isSelected: currentMode == ThemeMode.light,
+            onTap: () => themeProvider.setThemeMode(ThemeMode.light),
           ),
           const Divider(height: 1, indent: 56),
           _buildThemeOption(
+            context: context,
             title: 'Mode Gelap',
             subtitle: 'Gunakan tema gelap',
             icon: Icons.dark_mode_rounded,
-            isSelected: _themeMode == ThemeMode.dark,
-            onTap: () => _setThemeMode(ThemeMode.dark),
+            isSelected: currentMode == ThemeMode.dark,
+            onTap: () => themeProvider.setThemeMode(ThemeMode.dark),
           ),
           const Divider(height: 1, indent: 56),
           _buildThemeOption(
+            context: context,
             title: 'Ikuti Sistem',
             subtitle: 'Sesuaikan dengan pengaturan perangkat',
             icon: Icons.brightness_auto_rounded,
-            isSelected: _themeMode == ThemeMode.system,
-            onTap: () => _setThemeMode(ThemeMode.system),
+            isSelected: currentMode == ThemeMode.system,
+            onTap: () => themeProvider.setThemeMode(ThemeMode.system),
           ),
         ],
       ),
@@ -105,6 +112,7 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
   }
 
   Widget _buildThemeOption({
+    required BuildContext context,
     required String title,
     required String subtitle,
     required IconData icon,
@@ -130,7 +138,9 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
         title,
         style: AppTextStyles.body.copyWith(
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          color: isSelected ? AppColors.primary : AppColors.textPrimary,
+          color: isSelected
+              ? AppColors.primary
+              : Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
       subtitle: Text(subtitle, style: AppTextStyles.caption),
@@ -141,21 +151,14 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
     );
   }
 
-  void _setThemeMode(ThemeMode mode) {
-    setState(() {
-      _themeMode = mode;
-    });
-    // TODO: Save to SharedPreferences and update theme
-  }
-
-  Widget _buildAboutSection() {
+  Widget _buildAboutSection(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -164,6 +167,7 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
       child: Column(
         children: [
           _buildAboutItem(
+            context: context,
             icon: Icons.info_outline,
             title: 'Tentang Aplikasi',
             onTap: () {
@@ -194,6 +198,7 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
           ),
           const Divider(height: 1, indent: 56),
           _buildAboutItem(
+            context: context,
             icon: Icons.code_rounded,
             title: 'Versi',
             trailing: Text('1.0.0', style: AppTextStyles.bodySmall),
@@ -204,6 +209,7 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
   }
 
   Widget _buildAboutItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     Widget? trailing,
