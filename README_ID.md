@@ -62,7 +62,7 @@ flutter run
 
 Tangkapan layar (screenshot) antarmuka UangKu tersimpan di folder:
 
-> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
+> 🗂️ **`/preview`**
 
 | Tampilan | File | Keterangan |
 |---|---|---|

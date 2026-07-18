@@ -62,7 +62,7 @@ flutter run
 
 Screenshots of the UangKu interface are stored in the folder:
 
-> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
+> 🗂️ **`/preview`**
 
 | Screen | File | Description |
 |---|---|---|

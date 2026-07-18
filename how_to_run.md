@@ -90,7 +90,7 @@ flutter build ios --release
 
 Screenshot antarmuka UangKu tersimpan di folder:
 
-> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
+> 🗂️ **`/preview`**
 
 | Tampilan | File |
 |---|---|

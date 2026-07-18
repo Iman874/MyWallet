@@ -60,7 +60,27 @@ Dampak:
 ==================================================
 ==================================================
 Tanggal : 2026-07-18
-Waktu   : 23:30
+Waktu   : 19:30
+Kategori: Feature
+
+Judul:
+Dokumentasi README bilingual + preview app folder ai-agent-hybrid
+
+Detail:
+- Format mengikuti repo referensi D:\Iman874\Documents\Github\ai-agent-hybrid (badge bahasa EN/ID, Feature Highlights, Tech Stack, Quick Start, Project Structure, Release History, License)
+- 4 file: README.md (ringkas bilingual), README_EN.md (detail EN), README_ID.md (detail ID), how_to_run.md
+- Versi terkini app sudah v0.9 (bukan v0.3) — semua fitur v0.1–v0.9 didokumentasikan (Foundation, Dashboard, Riwayat, Modern UI, Stats/Kategori, Detail/Notif, Detail/Toast, Splash, Portfolio)
+- Bagian khusus Preview Aplikasi di semua file menunjuk ke folder D:\Iman874\Documents\Github\ai-agent-hybrid dengan nama file placeholder: uangku-dashboard.png, uangku-tambah.png, uangku-riwayat.png, uangku-statistik.png, uangku-splash.png
+- Tech stack akurat: fl_chart, file_picker, DB v5, 56 test pass
+
+Dampak:
+- README terstruktur rapi, konsisten dengan repo hybrid
+- Tempat khusus preview screenshot sudah tersedia (tinggal letakkan PNG di folder ai-agent-hybrid)
+- Commit: 5a25ffc
+
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 17:30
 Kategori: Feature
 
 Judul:
