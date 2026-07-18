@@ -4,6 +4,8 @@ import 'core/theme/app_theme.dart';
 import 'presentation/providers/transaksi_provider.dart';
 import 'presentation/providers/kategori_provider.dart';
 import 'presentation/providers/theme_provider.dart';
+import 'presentation/providers/batas_provider.dart';
+import 'presentation/providers/notifikasi_provider.dart';
 import 'presentation/screens/home_screen.dart';
 
 void main() {
@@ -20,6 +22,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TransaksiProvider()..loadAll()),
         ChangeNotifierProvider(create: (_) => KategoriProvider()..loadAll()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => BatasProvider()),
+        ChangeNotifierProvider(create: (_) => NotifikasiProvider()..loadAll()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

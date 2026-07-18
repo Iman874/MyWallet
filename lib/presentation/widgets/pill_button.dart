@@ -24,9 +24,9 @@ class PillButton extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.15) : AppColors.card,
+          color: isSelected ? color.withValues(alpha: 0.15) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
             color: isSelected ? color : AppColors.border,
@@ -35,21 +35,27 @@ class PillButton extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppColors.white, size: 16),
+              child: Icon(icon, color: AppColors.white, size: 14),
             ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: AppTextStyles.body.copyWith(
-                color: isSelected ? color : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodyContext(context).copyWith(
+                  fontSize: 13,
+                  color: isSelected ? color : null,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
             ),
           ],

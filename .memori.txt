@@ -1,4 +1,79 @@
 ==================================================
+Tanggal : 2026-07-18
+Waktu   : 14:30
+Kategori: Feature
+
+Judul:
+Plan v0.6 Detail Transaksi & Notifikasi dibuat
+
+Detail:
+- 6 task untuk fitur baru:
+  - Task 1: Database & Model Notifikasi (tabel notifikasi, entity, repository)
+  - Task 2: Detail Transaksi Screen (tap transaksi di dashboard → detail)
+  - Task 3: Pengaturan Batas Pemakaian (harian/mingguan/bulanan di SharedPreferences)
+  - Task 4: Logika Notifikasi Otomatis (cek batas saat tambah pengeluaran)
+  - Task 5: Halaman Notifikasi & Badge (ikon notifikasi di dashboard)
+  - Task 6: Test & Final Verify
+- Default batas: Harian Rp 200.000, Mingguan Rp 1.500.000, Bulanan Rp 5.000.000
+- Notifikasi in-app (bukan push notification)
+- Database version naik ke 4
+
+Dampak:
+- Dashboard ada ikon notifikasi dengan badge
+- Tap transaksi → detail screen
+- Pengaturan ada section batas pemakaian
+- Notifikasi otomatis saat batas tercapai
+==================================================
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 09:15
+Kategori: Bug
+
+Judul:
+Perbaikan Dark Mode - fix hardcode light mode colors
+
+Detail:
+- Masalah: beberapa screen/widget hardcode warna light mode (Color(0xFFF5F7FB))
+- File yang di-fix:
+  1. kategori_screen.dart:28 - backgroundColor hardcode → Theme.of(context).scaffoldBackgroundColor
+  2. tambah_transaksi_screen.dart:81 - backgroundColor hardcode → Theme.of(context).scaffoldBackgroundColor
+  3. app_colors.dart - tambah dark mode variants (backgroundDark, cardDark, textPrimaryDark, textSecondaryDark, greyLightDark) + method forBrightness(context, light, dark)
+  4. app_text_styles.dart - tambah context-aware methods (heading4Context, bodyContext, captionContext, dll)
+- flutter analyze: 1 info (use_null_aware_elements) - bukan error
+- flutter test: 29/29 pass
+
+Dampak:
+- Background screen sekarang mengikuti theme (light/dark)
+- Widget lain masih pakai AppTextStyles statis (light default) - perlu update bertahap
+==================================================
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 08:30
+Kategori: Note
+
+Judul:
+Update status proyek - v0.1 s/d v0.5 sudah selesai diimplementasi
+
+Detail:
+- Status terkini setelah cek codebase:
+  - v0.1 Foundation: ✅ selesai (model, database, repository, provider, theme, 18 unit test)
+  - v0.2 Dashboard & Catat Transaksi: ✅ selesai (dashboard_screen, tambah_transaksi_screen, semua widget)
+  - v0.3 Riwayat Transaksi: ✅ selesai (riwayat_screen, sticky_header, transaksi_list_item, edit/hapus)
+  - v0.4 Modern UI Redesign: ✅ selesai (gradient_header, modern_card, pill_button, icon_prefix, updated theme)
+  - v0.5 Statistik/Kategori/Pengaturan: ✅ selesai (kategori_screen CRUD, statistik_screen chart, pengaturan_screen theme toggle)
+- flutter analyze: 1 info (use_null_aware_elements di sticky_header:66) - bukan error
+- flutter test: 29/29 pass
+- File baru sudah ada: kategori.dart, kategori_repository.dart, kategori_repository_impl.dart, kategori_provider.dart, theme_provider.dart
+- 5 tab aktif: Beranda, Riwayat, Statistik, Kategori, Pengaturan
+- MultiProvider: TransaksiProvider, KategoriProvider, ThemeProvider
+- Theme: light/dark/system toggle sudah berfungsi
+
+Dampak:
+- MVP Fase 1 sudah lengkap secara fitur
+- Tinggal polish, testing lebih lanjut, atau fitur tambahan
+- Satu file modified tidak staged: macos/Flutter/GeneratedPluginRegistrant.swift
+==================================================
+==================================================
 Tanggal : 2026-07-17
 Waktu   : 21:00
 Kategori: Feature

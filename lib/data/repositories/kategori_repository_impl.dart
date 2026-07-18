@@ -17,6 +17,15 @@ class KategoriRepositoryImpl implements KategoriRepository {
   }
 
   @override
+  Future<List<Kategori>> getByTipe(String tipe) async {
+    final maps = await _databaseHelper.rawQuery(
+      'SELECT * FROM kategori WHERE tipe = ? ORDER BY isDefault DESC, nama ASC',
+      [tipe],
+    );
+    return maps.map((map) => Kategori.fromMap(map)).toList();
+  }
+
+  @override
   Future<Kategori?> getById(int id) async {
     final maps = await _databaseHelper.rawQuery(
       'SELECT * FROM kategori WHERE id = ?',
@@ -31,8 +40,8 @@ class KategoriRepositoryImpl implements KategoriRepository {
     final map = kategori.toMap();
     map.remove('id');
     return await _databaseHelper.rawInsert(
-      'INSERT INTO kategori (nama, icon, warna, isDefault) VALUES (?, ?, ?, ?)',
-      [map['nama'], map['icon'], map['warna'], map['isDefault']],
+      'INSERT INTO kategori (nama, icon, warna, isDefault, tipe) VALUES (?, ?, ?, ?, ?)',
+      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['tipe']],
     );
   }
 
@@ -40,8 +49,8 @@ class KategoriRepositoryImpl implements KategoriRepository {
   Future<int> update(Kategori kategori) async {
     final map = kategori.toMap();
     return await _databaseHelper.rawUpdate(
-      'UPDATE kategori SET nama = ?, icon = ?, warna = ?, isDefault = ? WHERE id = ?',
-      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['id']],
+      'UPDATE kategori SET nama = ?, icon = ?, warna = ?, isDefault = ?, tipe = ? WHERE id = ?',
+      [map['nama'], map['icon'], map['warna'], map['isDefault'], map['tipe'], map['id']],
     );
   }
 

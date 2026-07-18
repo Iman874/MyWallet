@@ -6,6 +6,7 @@ import '../widgets/transaksi_list_item.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_decorations.dart';
+import 'detail_transaksi_screen.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -264,10 +265,19 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
           itemCount: provider.list.length,
           itemBuilder: (context, index) {
+            final item = provider.list[index];
             return TransaksiListItem(
-              transaksi: provider.list[index],
-              onTap: () => _showEditDialog(provider.list[index]),
-              onDelete: () => _showDeleteDialog(provider.list[index].id!),
+              transaksi: item,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetailTransaksiScreen(transaksi: item),
+                  ),
+                );
+              },
+              onEdit: () => _showEditDialog(item),
+              onDelete: () => _showDeleteDialog(item.id!),
             );
           },
         );

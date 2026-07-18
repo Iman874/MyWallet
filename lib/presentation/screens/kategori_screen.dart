@@ -14,6 +14,8 @@ class KategoriScreen extends StatefulWidget {
 }
 
 class _KategoriScreenState extends State<KategoriScreen> {
+  int _selectedTab = 0; // 0 = Pengeluaran, 1 = Pemasukan
+
   @override
   void initState() {
     super.initState();
@@ -25,7 +27,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           StickyHeader(
@@ -44,6 +46,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
               ),
             ),
           ),
+          _buildTabBar(context),
           Expanded(
             child: _buildContent(),
           ),
@@ -79,6 +82,76 @@ class _KategoriScreenState extends State<KategoriScreen> {
     );
   }
 
+  Widget _buildTabBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildTab(
+                label: 'Pengeluaran',
+                icon: Icons.arrow_downward,
+                color: AppColors.error,
+                isSelected: _selectedTab == 0,
+                onTap: () => setState(() => _selectedTab = 0),
+              ),
+            ),
+            Expanded(
+              child: _buildTab(
+                label: 'Pemasukan',
+                icon: Icons.arrow_upward,
+                color: AppColors.success,
+                isSelected: _selectedTab == 1,
+                onTap: () => setState(() => _selectedTab = 1),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTab({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: isSelected ? color : AppColors.grey, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? color : AppColors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent() {
     return Consumer<KategoriProvider>(
       builder: (context, provider, child) {
@@ -86,7 +159,9 @@ class _KategoriScreenState extends State<KategoriScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (provider.list.isEmpty) {
+        final list = _selectedTab == 0 ? provider.listPengeluaran : provider.listPemasukan;
+
+        if (list.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -106,8 +181,8 @@ class _KategoriScreenState extends State<KategoriScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Belum ada kategori',
-                  style: AppTextStyles.heading4.copyWith(
-                    color: AppColors.textSecondary,
+                  style: AppTextStyles.heading4Context(context).copyWith(
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                 ),
               ],
@@ -116,10 +191,10 @@ class _KategoriScreenState extends State<KategoriScreen> {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-          itemCount: provider.list.length,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+          itemCount: list.length,
           itemBuilder: (context, index) {
-            final kategori = provider.list[index];
+            final kategori = list[index];
             return _buildKategoriItem(kategori);
           },
         );
@@ -131,11 +206,11 @@ class _KategoriScreenState extends State<KategoriScreen> {
     final color = Color(int.parse('FF${kategori.warna.replaceAll('#', '')}', radix: 16));
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -147,28 +222,28 @@ class _KategoriScreenState extends State<KategoriScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(_getIcon(kategori.icon), color: color, size: 24),
+            child: Icon(_getIcon(kategori.icon), color: color, size: 20),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   kategori.nama,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyContext(context).copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 if (kategori.isDefault)
                   Text(
                     'Default',
-                    style: AppTextStyles.caption.copyWith(
+                    style: AppTextStyles.captionContext(context).copyWith(
                       color: AppColors.primary,
                       fontSize: 11,
                     ),
@@ -178,20 +253,26 @@ class _KategoriScreenState extends State<KategoriScreen> {
           ),
           if (!kategori.isDefault) ...[
             IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 20),
+              icon: const Icon(Icons.edit_outlined, size: 18),
               color: AppColors.primary,
               onPressed: () => _showEditDialog(kategori),
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              padding: EdgeInsets.zero,
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20),
+              icon: const Icon(Icons.delete_outline, size: 18),
               color: AppColors.error,
               onPressed: () => _showDeleteDialog(kategori),
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              padding: EdgeInsets.zero,
             ),
           ] else
             IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 20),
+              icon: const Icon(Icons.edit_outlined, size: 18),
               color: AppColors.primary,
               onPressed: () => _showEditDialog(kategori),
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              padding: EdgeInsets.zero,
             ),
         ],
       ),
@@ -225,6 +306,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
     final namaController = TextEditingController();
     String selectedIcon = 'category';
     String selectedColor = '#6B7280';
+    String selectedTipe = _selectedTab == 0 ? 'pengeluaran' : 'pemasukan';
 
     final icons = [
       {'name': 'attach_money', 'icon': Icons.attach_money},
@@ -246,8 +328,9 @@ class _KategoriScreenState extends State<KategoriScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text('Tambah Kategori', style: AppTextStyles.heading4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Theme.of(context).cardColor,
+          title: Text('Tambah Kategori', style: AppTextStyles.heading4Context(context)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -255,70 +338,133 @@ class _KategoriScreenState extends State<KategoriScreen> {
               children: [
                 TextField(
                   controller: namaController,
+                  style: AppTextStyles.inputContext(context),
                   decoration: InputDecoration(
                     hintText: 'Nama kategori',
+                    hintStyle: AppTextStyles.bodyContext(context).copyWith(color: AppColors.grey),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text('Icon', style: AppTextStyles.label),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                Text('Tipe', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setDialogState(() => selectedTipe = 'pengeluaran'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: selectedTipe == 'pengeluaran'
+                                ? AppColors.error.withValues(alpha: 0.15)
+                                : Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: selectedTipe == 'pengeluaran' ? AppColors.error : AppColors.border,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_downward, size: 14, color: AppColors.error),
+                              const SizedBox(width: 4),
+                              Text('Pengeluaran', style: TextStyle(
+                                fontSize: 12,
+                                color: selectedTipe == 'pengeluaran' ? AppColors.error : AppColors.grey,
+                                fontWeight: FontWeight.w500,
+                              )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setDialogState(() => selectedTipe = 'pemasukan'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: selectedTipe == 'pemasukan'
+                                ? AppColors.success.withValues(alpha: 0.15)
+                                : Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: selectedTipe == 'pemasukan' ? AppColors.success : AppColors.border,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_upward, size: 14, color: AppColors.success),
+                              const SizedBox(width: 4),
+                              Text('Pemasukan', style: TextStyle(
+                                fontSize: 12,
+                                color: selectedTipe == 'pemasukan' ? AppColors.success : AppColors.grey,
+                                fontWeight: FontWeight.w500,
+                              )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text('Icon', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: icons.map((icon) {
                     final isSelected = selectedIcon == icon['name'];
                     return GestureDetector(
-                      onTap: () {
-                        setDialogState(() {
-                          selectedIcon = icon['name'] as String;
-                        });
-                      },
+                      onTap: () => setDialogState(() => selectedIcon = icon['name'] as String),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.primary.withValues(alpha: 0.1)
                               : AppColors.greyLight,
-                          borderRadius: BorderRadius.circular(8),
-                          border: isSelected
-                              ? Border.all(color: AppColors.primary)
-                              : null,
+                          borderRadius: BorderRadius.circular(6),
+                          border: isSelected ? Border.all(color: AppColors.primary) : null,
                         ),
                         child: Icon(
                           icon['icon'] as IconData,
                           color: isSelected ? AppColors.primary : AppColors.grey,
-                          size: 20,
+                          size: 18,
                         ),
                       ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 16),
-                Text('Warna', style: AppTextStyles.label),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                Text('Warna', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: colors.map((color) {
                     final isSelected = selectedColor == color;
                     final colorValue = Color(int.parse('FF${color.replaceAll('#', '')}', radix: 16));
                     return GestureDetector(
-                      onTap: () {
-                        setDialogState(() {
-                          selectedColor = color;
-                        });
-                      },
+                      onTap: () => setDialogState(() => selectedColor = color),
                       child: Container(
-                        width: 36,
-                        height: 36,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           color: colorValue,
                           shape: BoxShape.circle,
                           border: isSelected
-                              ? Border.all(color: AppColors.textPrimary, width: 2)
+                              ? Border.all(
+                                  color: Theme.of(context).brightness == Brightness.dark
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.textPrimary,
+                                  width: 2,
+                                )
                               : null,
                         ),
                       ),
@@ -331,7 +477,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+              child: Text('Batal', style: AppTextStyles.bodyContext(context).copyWith(color: AppColors.textSecondary)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -341,6 +487,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
                       nama: namaController.text,
                       icon: selectedIcon,
                       warna: selectedColor,
+                      tipe: selectedTipe,
                     ),
                   );
                   Navigator.pop(context);
@@ -358,6 +505,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
     final namaController = TextEditingController(text: kategori.nama);
     String selectedIcon = kategori.icon;
     String selectedColor = kategori.warna;
+    String selectedTipe = kategori.tipe;
 
     final icons = [
       {'name': 'attach_money', 'icon': Icons.attach_money},
@@ -379,8 +527,9 @@ class _KategoriScreenState extends State<KategoriScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text('Edit Kategori', style: AppTextStyles.heading4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Theme.of(context).cardColor,
+          title: Text('Edit Kategori', style: AppTextStyles.heading4Context(context)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -388,70 +537,133 @@ class _KategoriScreenState extends State<KategoriScreen> {
               children: [
                 TextField(
                   controller: namaController,
+                  style: AppTextStyles.inputContext(context),
                   decoration: InputDecoration(
                     hintText: 'Nama kategori',
+                    hintStyle: AppTextStyles.bodyContext(context).copyWith(color: AppColors.grey),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text('Icon', style: AppTextStyles.label),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                Text('Tipe', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setDialogState(() => selectedTipe = 'pengeluaran'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: selectedTipe == 'pengeluaran'
+                                ? AppColors.error.withValues(alpha: 0.15)
+                                : Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: selectedTipe == 'pengeluaran' ? AppColors.error : AppColors.border,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_downward, size: 14, color: AppColors.error),
+                              const SizedBox(width: 4),
+                              Text('Pengeluaran', style: TextStyle(
+                                fontSize: 12,
+                                color: selectedTipe == 'pengeluaran' ? AppColors.error : AppColors.grey,
+                                fontWeight: FontWeight.w500,
+                              )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setDialogState(() => selectedTipe = 'pemasukan'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: selectedTipe == 'pemasukan'
+                                ? AppColors.success.withValues(alpha: 0.15)
+                                : Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: selectedTipe == 'pemasukan' ? AppColors.success : AppColors.border,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_upward, size: 14, color: AppColors.success),
+                              const SizedBox(width: 4),
+                              Text('Pemasukan', style: TextStyle(
+                                fontSize: 12,
+                                color: selectedTipe == 'pemasukan' ? AppColors.success : AppColors.grey,
+                                fontWeight: FontWeight.w500,
+                              )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text('Icon', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: icons.map((icon) {
                     final isSelected = selectedIcon == icon['name'];
                     return GestureDetector(
-                      onTap: () {
-                        setDialogState(() {
-                          selectedIcon = icon['name'] as String;
-                        });
-                      },
+                      onTap: () => setDialogState(() => selectedIcon = icon['name'] as String),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.primary.withValues(alpha: 0.1)
                               : AppColors.greyLight,
-                          borderRadius: BorderRadius.circular(8),
-                          border: isSelected
-                              ? Border.all(color: AppColors.primary)
-                              : null,
+                          borderRadius: BorderRadius.circular(6),
+                          border: isSelected ? Border.all(color: AppColors.primary) : null,
                         ),
                         child: Icon(
                           icon['icon'] as IconData,
                           color: isSelected ? AppColors.primary : AppColors.grey,
-                          size: 20,
+                          size: 18,
                         ),
                       ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 16),
-                Text('Warna', style: AppTextStyles.label),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                Text('Warna', style: AppTextStyles.labelContext(context)),
+                const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: colors.map((color) {
                     final isSelected = selectedColor == color;
                     final colorValue = Color(int.parse('FF${color.replaceAll('#', '')}', radix: 16));
                     return GestureDetector(
-                      onTap: () {
-                        setDialogState(() {
-                          selectedColor = color;
-                        });
-                      },
+                      onTap: () => setDialogState(() => selectedColor = color),
                       child: Container(
-                        width: 36,
-                        height: 36,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           color: colorValue,
                           shape: BoxShape.circle,
                           border: isSelected
-                              ? Border.all(color: AppColors.textPrimary, width: 2)
+                              ? Border.all(
+                                  color: Theme.of(context).brightness == Brightness.dark
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.textPrimary,
+                                  width: 2,
+                                )
                               : null,
                         ),
                       ),
@@ -464,7 +676,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+              child: Text('Batal', style: AppTextStyles.bodyContext(context).copyWith(color: AppColors.textSecondary)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -474,6 +686,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
                       nama: namaController.text,
                       icon: selectedIcon,
                       warna: selectedColor,
+                      tipe: selectedTipe,
                     ),
                   );
                   Navigator.pop(context);
@@ -491,16 +704,17 @@ class _KategoriScreenState extends State<KategoriScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Hapus Kategori', style: AppTextStyles.heading4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text('Hapus Kategori', style: AppTextStyles.heading4Context(context)),
         content: Text(
           'Yakin ingin menghapus "${kategori.nama}"?',
-          style: AppTextStyles.body,
+          style: AppTextStyles.bodyContext(context),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+            child: Text('Batal', style: AppTextStyles.bodyContext(context).copyWith(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

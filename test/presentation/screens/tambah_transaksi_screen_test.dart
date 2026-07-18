@@ -2,12 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:uangku/presentation/providers/transaksi_provider.dart';
+import 'package:uangku/presentation/providers/kategori_provider.dart';
+import 'package:uangku/presentation/providers/notifikasi_provider.dart';
+import 'package:uangku/presentation/providers/batas_provider.dart';
+import 'package:uangku/presentation/providers/theme_provider.dart';
 import 'package:uangku/presentation/screens/tambah_transaksi_screen.dart';
 
 void main() {
   Widget createWidgetUnderTest() {
-    return ChangeNotifierProvider<TransaksiProvider>(
-      create: (_) => TransaksiProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TransaksiProvider()),
+        ChangeNotifierProvider(create: (_) => KategoriProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => BatasProvider()),
+        ChangeNotifierProvider(create: (_) => NotifikasiProvider()),
+      ],
       child: const MaterialApp(
         home: TambahTransaksiScreen(),
       ),
@@ -22,7 +32,6 @@ void main() {
       expect(find.text('Jumlah'), findsOneWidget);
       expect(find.text('Tanggal'), findsOneWidget);
       expect(find.text('Kategori'), findsOneWidget);
-      expect(find.text('Tipe Transaksi'), findsOneWidget);
       expect(find.text('Catatan (opsional)'), findsOneWidget);
     });
 
@@ -37,7 +46,6 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.text('Kategori'), findsOneWidget);
-      expect(find.text('Makan'), findsOneWidget);
     });
 
     testWidgets('should show gradient header', (tester) async {

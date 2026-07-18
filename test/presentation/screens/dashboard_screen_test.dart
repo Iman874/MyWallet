@@ -3,15 +3,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:uangku/domain/entities/transaksi.dart';
 import 'package:uangku/presentation/providers/transaksi_provider.dart';
+import 'package:uangku/presentation/providers/kategori_provider.dart';
+import 'package:uangku/presentation/providers/notifikasi_provider.dart';
+import 'package:uangku/presentation/providers/batas_provider.dart';
+import 'package:uangku/presentation/providers/theme_provider.dart';
 import 'package:uangku/presentation/screens/dashboard_screen.dart';
 
 void main() {
   Widget createWidgetUnderTest({List<Transaksi>? transaksiList}) {
-    final provider = TransaksiProvider();
-
-    return ChangeNotifierProvider<TransaksiProvider>(
-      create: (_) => provider,
-      child: MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TransaksiProvider()),
+        ChangeNotifierProvider(create: (_) => KategoriProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => BatasProvider()),
+        ChangeNotifierProvider(create: (_) => NotifikasiProvider()),
+      ],
+      child: const MaterialApp(
         home: DashboardScreen(),
       ),
     );

@@ -17,23 +17,21 @@ class DatabaseHelper {
 
   Future<Database> _initDB(String filePath) async {
     if (kIsWeb) {
-      // Web: use sqflite_ffi_web (IndexedDB)
       databaseFactory = databaseFactoryFfiWeb;
       return await databaseFactory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
-          version: 2,
+          version: 4,
           onCreate: _createDB,
           onUpgrade: _onUpgrade,
         ),
       );
     } else {
-      // Mobile/Desktop: use default sqflite
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, filePath);
       return await openDatabase(
         path,
-        version: 2,
+        version: 4,
         onCreate: _createDB,
         onUpgrade: _onUpgrade,
       );
@@ -49,7 +47,6 @@ class DatabaseHelper {
   }
 
   Future _createDB(Database db, int version) async {
-    // Tabel transaksi
     await db.execute('''
       CREATE TABLE transaksi (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,22 +58,32 @@ class DatabaseHelper {
       )
     ''');
 
-    await db.execute(
-      'CREATE INDEX idx_tanggal ON transaksi (tanggal)',
-    );
+    await db.execute('CREATE INDEX idx_tanggal ON transaksi (tanggal)');
 
-    // Tabel kategori
     await db.execute('''
       CREATE TABLE kategori (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nama TEXT NOT NULL,
         icon TEXT NOT NULL,
         warna TEXT NOT NULL,
-        isDefault INTEGER NOT NULL DEFAULT 0
+        isDefault INTEGER NOT NULL DEFAULT 0,
+        tipe TEXT NOT NULL DEFAULT 'pengeluaran'
       )
     ''');
 
-    // Insert kategori default
+    await db.execute('''
+      CREATE TABLE notifikasi (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        judul TEXT NOT NULL,
+        pesan TEXT NOT NULL,
+        tipe TEXT NOT NULL,
+        jumlah_pengeluaran INTEGER NOT NULL,
+        batas INTEGER NOT NULL,
+        isRead INTEGER NOT NULL DEFAULT 0,
+        createdAt INTEGER NOT NULL
+      )
+    ''');
+
     await _insertDefaultKategori(db);
   }
 
@@ -93,20 +100,43 @@ class DatabaseHelper {
       ''');
       await _insertDefaultKategori(db);
     }
+    if (oldVersion < 3) {
+      await db.execute("ALTER TABLE kategori ADD COLUMN tipe TEXT NOT NULL DEFAULT 'pengeluaran'");
+      await _updateDefaultKategoriTipe(db);
+    }
+    if (oldVersion < 4) {
+      await db.execute('''
+        CREATE TABLE notifikasi (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          judul TEXT NOT NULL,
+          pesan TEXT NOT NULL,
+          tipe TEXT NOT NULL,
+          jumlah_pengeluaran INTEGER NOT NULL,
+          batas INTEGER NOT NULL,
+          isRead INTEGER NOT NULL DEFAULT 0,
+          createdAt INTEGER NOT NULL
+        )
+      ''');
+    }
   }
 
   Future _insertDefaultKategori(Database db) async {
     final defaultKategori = [
-      {'nama': 'Gaji', 'icon': 'attach_money', 'warna': '#22C55E', 'isDefault': 1},
-      {'nama': 'Makan', 'icon': 'restaurant', 'warna': '#EF4444', 'isDefault': 1},
-      {'nama': 'Transportasi', 'icon': 'directions_car', 'warna': '#4F8CFF', 'isDefault': 1},
-      {'nama': 'Hiburan', 'icon': 'sports_esports', 'warna': '#A855F7', 'isDefault': 1},
-      {'nama': 'Lainnya', 'icon': 'category', 'warna': '#6B7280', 'isDefault': 1},
+      {'nama': 'Gaji', 'icon': 'attach_money', 'warna': '#22C55E', 'isDefault': 1, 'tipe': 'pemasukan'},
+      {'nama': 'Makan', 'icon': 'restaurant', 'warna': '#EF4444', 'isDefault': 1, 'tipe': 'pengeluaran'},
+      {'nama': 'Transportasi', 'icon': 'directions_car', 'warna': '#4F8CFF', 'isDefault': 1, 'tipe': 'pengeluaran'},
+      {'nama': 'Hiburan', 'icon': 'sports_esports', 'warna': '#A855F7', 'isDefault': 1, 'tipe': 'pengeluaran'},
+      {'nama': 'Lainnya', 'icon': 'category', 'warna': '#6B7280', 'isDefault': 1, 'tipe': 'pengeluaran'},
     ];
 
     for (final kategori in defaultKategori) {
       await db.insert('kategori', kategori);
     }
+  }
+
+  Future _updateDefaultKategoriTipe(Database db) async {
+    await db.rawUpdate("UPDATE kategori SET tipe = 'pemasukan' WHERE nama = 'Gaji'");
+    await db.rawUpdate("UPDATE kategori SET tipe = 'pengeluaran' WHERE nama != 'Gaji'");
   }
 
   Future<int> rawInsert(String sql, [List<dynamic>? arguments]) async {

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/transaksi_provider.dart';
+import '../providers/kategori_provider.dart';
+import '../providers/batas_provider.dart';
+import '../providers/notifikasi_provider.dart';
 import '../../domain/entities/transaksi.dart';
+import '../../domain/entities/kategori.dart';
+import '../../domain/services/notifikasi_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/theme/app_decorations.dart';
-import '../widgets/pill_button.dart';
-import '../widgets/icon_prefix.dart';
 
 class TambahTransaksiScreen extends StatefulWidget {
   const TambahTransaksiScreen({super.key});
@@ -17,27 +20,65 @@ class TambahTransaksiScreen extends StatefulWidget {
 }
 
 class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _jumlahController = TextEditingController();
   final _catatanController = TextEditingController();
-
+  final _catatanFocusNode = FocusNode();
+  String _amount = '';
   DateTime _selectedDate = DateTime.now();
   String _selectedKategori = 'Makan';
   TransaksiType _selectedTipe = TransaksiType.pemasukan;
+  bool _isCatatanFocused = false;
+  List<Kategori> _kategoriList = [];
 
-  final List<Map<String, dynamic>> _kategoriList = [
-    {'nama': 'Gaji', 'icon': Icons.attach_money, 'color': AppColors.success},
-    {'nama': 'Makan', 'icon': Icons.restaurant, 'color': AppColors.error},
-    {'nama': 'Transportasi', 'icon': Icons.directions_car, 'color': AppColors.primary},
-    {'nama': 'Hiburan', 'icon': Icons.sports_esports, 'color': AppColors.primaryLight},
-    {'nama': 'Lainnya', 'icon': Icons.category, 'color': AppColors.grey},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _catatanFocusNode.addListener(() {
+      setState(() {
+        _isCatatanFocused = _catatanFocusNode.hasFocus;
+      });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadKategori();
+    });
+  }
+
+  void _loadKategori() {
+    final provider = context.read<KategoriProvider>();
+    final list = _selectedTipe == TransaksiType.pemasukan
+        ? provider.listPemasukan
+        : provider.listPengeluaran;
+    if (list.isNotEmpty) {
+      setState(() {
+        _kategoriList = list;
+        if (!_kategoriList.any((k) => k.nama == _selectedKategori)) {
+          _selectedKategori = _kategoriList.first.nama;
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
-    _jumlahController.dispose();
     _catatanController.dispose();
+    _catatanFocusNode.dispose();
     super.dispose();
+  }
+
+  void _onNumberTap(String value) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      if (value == 'C') {
+        _amount = '';
+      } else if (value == '<') {
+        if (_amount.isNotEmpty) {
+          _amount = _amount.substring(0, _amount.length - 1);
+        }
+      } else {
+        if (_amount.length < 12) {
+          _amount += value;
+        }
+      }
+    });
   }
 
   Future<void> _selectDate() async {
@@ -55,9 +96,11 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_amount.isEmpty || int.tryParse(_amount) == null) return;
 
-    final jumlah = int.parse(_jumlahController.text);
+    final jumlah = int.parse(_amount);
+    if (jumlah <= 0) return;
+
     final catatan = _catatanController.text.isEmpty ? null : _catatanController.text;
 
     final transaksi = Transaksi(
@@ -68,336 +111,535 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
       tipe: _selectedTipe,
     );
 
-    await context.read<TransaksiProvider>().add(transaksi);
+    final transaksiProvider = context.read<TransaksiProvider>();
+    final batasProvider = context.read<BatasProvider>();
+    final notifikasiProvider = context.read<NotifikasiProvider>();
+
+    await transaksiProvider.add(transaksi);
+
+    // Cek batas dan buat notifikasi jika melebihi
+    if (transaksi.tipe == TransaksiType.pengeluaran) {
+      final service = NotifikasiService(
+        transaksiProvider: transaksiProvider,
+        batasProvider: batasProvider,
+        notifikasiProvider: notifikasiProvider,
+      );
+      await service.cekDanBuatNotifikasi(transaksi);
+    }
 
     if (mounted) {
       Navigator.pop(context);
     }
   }
 
+  String get _formattedAmount {
+    if (_amount.isEmpty) return '0';
+    final number = int.parse(_amount);
+    return number.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 12, 16, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  ),
-                  Text(
-                    'Tambah Transaksi',
-                    style: AppTextStyles.heading3.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Form
+            _buildHeader(context),
             Expanded(
-              child: Consumer<TransaksiProvider>(
-                builder: (context, provider, child) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildJumlahField(),
-                          const SizedBox(height: 20),
-                          _buildTanggalField(),
-                          const SizedBox(height: 20),
-                          _buildKategoriField(),
-                          const SizedBox(height: 20),
-                          _buildTipeTransaksi(),
-                          const SizedBox(height: 20),
-                          _buildCatatanField(),
-                          const SizedBox(height: 24),
-                          _buildSimpanButton(provider),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                behavior: HitTestBehavior.translucent,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTipeTransaksi(context, isDark),
+                      const SizedBox(height: 16),
+                      _buildAmountDisplay(context),
+                      const SizedBox(height: 16),
+                      _buildDateAndCategory(context),
+                      const SizedBox(height: 16),
+                      _buildCatatanField(context),
+                    ],
+                  ),
+                ),
               ),
             ),
+            _buildSimpanButton(),
+            if (!_isCatatanFocused) _buildCustomNumpad(context, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildJumlahField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Jumlah', style: AppTextStyles.label),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _jumlahController,
-          keyboardType: TextInputType.number,
-          style: AppTextStyles.input.copyWith(fontSize: 24, fontWeight: FontWeight.w600),
-          decoration: InputDecoration(
-            prefixIcon: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Rp',
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Jumlah wajib diisi';
-            }
-            final jumlah = int.tryParse(value);
-            if (jumlah == null || jumlah <= 0) {
-              return 'Jumlah harus lebih dari 0';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTanggalField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Tanggal', style: AppTextStyles.label),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: _selectDate,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              children: [
-                IconPrefix(icon: Icons.calendar_today, color: AppColors.primary),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    DateFormat('dd MMMM yyyy').format(_selectedDate),
-                    style: AppTextStyles.input,
-                  ),
-                ),
-                const Icon(Icons.keyboard_arrow_down, color: AppColors.grey),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildKategoriField() {
-    final selectedKategori = _kategoriList.firstWhere(
-      (k) => k['nama'] == _selectedKategori,
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Kategori', style: AppTextStyles.label),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              builder: (context) => _buildKategoriBottomSheet(),
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              children: [
-                IconPrefix(
-                  icon: selectedKategori['icon'],
-                  color: selectedKategori['color'],
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _selectedKategori,
-                    style: AppTextStyles.input,
-                  ),
-                ),
-                const Icon(Icons.keyboard_arrow_down, color: AppColors.grey),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildKategoriBottomSheet() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
+      child: Row(
         children: [
-          Text('Pilih Kategori', style: AppTextStyles.heading4),
-          const SizedBox(height: 16),
-          ..._kategoriList.map(
-            (kategori) => ListTile(
-              leading: IconPrefix(
-                icon: kategori['icon'],
-                color: kategori['color'],
-              ),
-              title: Text(kategori['nama']),
-              trailing: _selectedKategori == kategori['nama']
-                  ? const Icon(Icons.check_circle, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                setState(() {
-                  _selectedKategori = kategori['nama'];
-                });
-                Navigator.pop(context);
-              },
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              size: 20,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
-          const SizedBox(height: 20),
+          Text(
+            'Tambah Transaksi',
+            style: AppTextStyles.heading3Context(context).copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTipeTransaksi() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildTipeTransaksi(BuildContext context, bool isDark) {
+    return Row(
       children: [
-        Text('Tipe Transaksi', style: AppTextStyles.label),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: PillButton(
-                label: 'Pemasukan',
-                icon: Icons.arrow_upward,
-                color: AppColors.success,
-                isSelected: _selectedTipe == TransaksiType.pemasukan,
-                onTap: () {
-                  setState(() {
-                    _selectedTipe = TransaksiType.pemasukan;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: PillButton(
-                label: 'Pengeluaran',
-                icon: Icons.arrow_downward,
-                color: AppColors.error,
-                isSelected: _selectedTipe == TransaksiType.pengeluaran,
-                onTap: () {
-                  setState(() {
-                    _selectedTipe = TransaksiType.pengeluaran;
-                  });
-                },
-              ),
-            ),
-          ],
+        Expanded(
+          child: _buildTipeButton(
+            context: context,
+            label: 'Pemasukan',
+            icon: Icons.arrow_upward,
+            color: AppColors.success,
+            isSelected: _selectedTipe == TransaksiType.pemasukan,
+            isDark: isDark,
+            onTap: () {
+              setState(() {
+                _selectedTipe = TransaksiType.pemasukan;
+                _selectedKategori = '';
+              });
+              _loadKategori();
+            },
+          ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildCatatanField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Catatan (opsional)', style: AppTextStyles.label),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _catatanController,
-          maxLines: 3,
-          style: AppTextStyles.input,
-          decoration: InputDecoration(
-            hintText: 'Tulis catatan transaksi...',
-            hintStyle: AppTextStyles.input.copyWith(color: AppColors.grey),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildTipeButton(
+            context: context,
+            label: 'Pengeluaran',
+            icon: Icons.arrow_downward,
+            color: AppColors.error,
+            isSelected: _selectedTipe == TransaksiType.pengeluaran,
+            isDark: isDark,
+            onTap: () {
+              setState(() {
+                _selectedTipe = TransaksiType.pengeluaran;
+                _selectedKategori = '';
+              });
+              _loadKategori();
+            },
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSimpanButton(TransaksiProvider provider) {
-    return SizedBox(
+  Widget _buildTipeButton({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required Color color,
+    required bool isSelected,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.15) : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? color : AppColors.border,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: AppTextStyles.bodyContext(context).copyWith(
+                fontSize: 13,
+                color: isSelected ? color : null,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAmountDisplay(BuildContext context) {
+    return Container(
       width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: provider.isLoading ? null : _submit,
-        style: AppDecorations.primaryFullButtonStyle,
-        icon: provider.isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppColors.white,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Jumlah',
+            style: AppTextStyles.captionContext(context),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Rp $_formattedAmount',
+            style: AppTextStyles.heading1Context(context).copyWith(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: _selectedTipe == TransaksiType.pemasukan
+                  ? AppColors.success
+                  : AppColors.error,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateAndCategory(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildDateChip(context),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildCategoryChip(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateChip(BuildContext context) {
+    return GestureDetector(
+      onTap: _selectDate,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today, color: AppColors.primary, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Tanggal', style: AppTextStyles.captionContext(context).copyWith(fontSize: 10)),
+                  const SizedBox(height: 2),
+                  Text(
+                    DateFormat('dd MMM yy').format(_selectedDate),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodyContext(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getKategoriIcon(String iconName) {
+    switch (iconName) {
+      case 'attach_money':
+        return Icons.attach_money;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'directions_car':
+        return Icons.directions_car;
+      case 'sports_esports':
+        return Icons.sports_esports;
+      case 'category':
+        return Icons.category;
+      case 'shopping_cart':
+        return Icons.shopping_cart;
+      case 'home':
+        return Icons.home;
+      case 'health_and_safety':
+        return Icons.health_and_safety;
+      default:
+        return Icons.category;
+    }
+  }
+
+  Color _getKategoriColor(String warna) {
+    return Color(int.parse('FF${warna.replaceAll('#', '')}', radix: 16));
+  }
+
+  Widget _buildCategoryChip(BuildContext context) {
+    final selected = _kategoriList.firstWhere(
+      (k) => k.nama == _selectedKategori,
+      orElse: () => Kategori(nama: _selectedKategori, icon: 'category', warna: '#6B7280'),
+    );
+    final iconData = _getKategoriIcon(selected.icon);
+    final color = _getKategoriColor(selected.warna);
+
+    return GestureDetector(
+      onTap: () => _showCategoryPicker(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(iconData, color: color, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Kategori', style: AppTextStyles.captionContext(context).copyWith(fontSize: 10)),
+                  const SizedBox(height: 2),
+                  Text(
+                    _selectedKategori,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodyContext(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCategoryPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Pilih Kategori', style: AppTextStyles.heading4Context(context)),
+            const SizedBox(height: 16),
+            ..._kategoriList.map(
+              (kategori) {
+                final iconData = _getKategoriIcon(kategori.icon);
+                final color = _getKategoriColor(kategori.warna);
+                return ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(iconData, color: color, size: 20),
+                  ),
+                  title: Text(kategori.nama, style: AppTextStyles.bodyContext(context)),
+                  trailing: _selectedKategori == kategori.nama
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    setState(() => _selectedKategori = kategori.nama);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCatatanField(BuildContext context) {
+    return TextField(
+      controller: _catatanController,
+      focusNode: _catatanFocusNode,
+      maxLines: 2,
+      style: AppTextStyles.inputContext(context),
+      decoration: InputDecoration(
+        hintText: 'Catatan (opsional)',
+        hintStyle: AppTextStyles.bodyContext(context).copyWith(color: AppColors.grey),
+        filled: true,
+        fillColor: Theme.of(context).cardColor,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+
+  Widget _buildSimpanButton() {
+    final canSubmit = _amount.isNotEmpty && int.tryParse(_amount) != null && int.parse(_amount) > 0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: canSubmit ? _submit : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.white,
+            disabledBackgroundColor: AppColors.grey,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          child: Text(
+            'Simpan',
+            style: AppTextStyles.button.copyWith(fontSize: 15),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomNumpad(BuildContext context, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A2E) : const Color(0xFFF0F0F0),
+        border: Border(
+          top: BorderSide(
+            color: AppColors.border,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              _buildNumpadKey('1', isDark),
+              _buildNumpadKey('2', isDark),
+              _buildNumpadKey('3', isDark),
+            ],
+          ),
+          Row(
+            children: [
+              _buildNumpadKey('4', isDark),
+              _buildNumpadKey('5', isDark),
+              _buildNumpadKey('6', isDark),
+            ],
+          ),
+          Row(
+            children: [
+              _buildNumpadKey('7', isDark),
+              _buildNumpadKey('8', isDark),
+              _buildNumpadKey('9', isDark),
+            ],
+          ),
+          Row(
+            children: [
+              _buildNumpadKey('C', isDark, isAction: true),
+              _buildNumpadKey('0', isDark),
+              _buildNumpadKey('<', isDark, isAction: true),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNumpadKey(String value, bool isDark, {bool isAction = false}) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(3),
+        child: GestureDetector(
+          onTap: () => _onNumberTap(value),
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: isAction
+                  ? (isDark ? const Color(0xFF2A2A3C) : Colors.white.withValues(alpha: 0.8))
+                  : (isDark ? const Color(0xFF2A2A3C) : Colors.white),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
-              )
-            : const Icon(Icons.save, color: AppColors.white),
-        label: Text(
-          provider.isLoading ? 'Menyimpan...' : 'Simpan',
-          style: AppTextStyles.button,
+              ],
+            ),
+            child: Center(
+              child: value == '<'
+                  ? Icon(Icons.backspace_outlined, color: isDark ? Colors.white70 : Colors.black54, size: 20)
+                  : Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: isAction
+                            ? (value == 'C' ? AppColors.error : (isDark ? Colors.white70 : Colors.black54))
+                            : (isDark ? Colors.white : Colors.black87),
+                      ),
+                    ),
+            ),
+          ),
         ),
       ),
     );

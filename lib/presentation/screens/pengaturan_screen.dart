@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/batas_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -34,13 +36,17 @@ class PengaturanScreen extends StatelessWidget {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionTitle(context, 'Tampilan'),
                   const SizedBox(height: 12),
                   _buildThemeSection(context, themeProvider),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle(context, 'Batas Pemakaian'),
+                  const SizedBox(height: 12),
+                  _buildBatasSection(context),
                   const SizedBox(height: 24),
                   _buildSectionTitle(context, 'Tentang'),
                   const SizedBox(height: 12),
@@ -57,9 +63,7 @@ class PengaturanScreen extends StatelessWidget {
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: AppTextStyles.heading4.copyWith(
-        color: Theme.of(context).textTheme.bodyLarge?.color,
-      ),
+      style: AppTextStyles.heading4Context(context),
     );
   }
 
@@ -69,7 +73,7 @@ class PengaturanScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -125,7 +129,7 @@ class PengaturanScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.greyLight,
+              : AppColors.forBrightness(context, AppColors.greyLight, AppColors.greyLightDark),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
@@ -136,14 +140,14 @@ class PengaturanScreen extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: AppTextStyles.body.copyWith(
+        style: AppTextStyles.bodyContext(context).copyWith(
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           color: isSelected
               ? AppColors.primary
               : Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
-      subtitle: Text(subtitle, style: AppTextStyles.caption),
+      subtitle: Text(subtitle, style: AppTextStyles.captionContext(context)),
       trailing: isSelected
           ? const Icon(Icons.check_circle, color: AppColors.primary, size: 22)
           : null,
@@ -151,11 +155,160 @@ class PengaturanScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildBatasSection(BuildContext context) {
+    return Consumer<BatasProvider>(
+      builder: (context, batasProvider, child) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildBatasItem(
+                context: context,
+                icon: Icons.today,
+                title: 'Harian',
+                value: batasProvider.batasHarian,
+                color: AppColors.error,
+                onChanged: (value) => batasProvider.setBatasHarian(value),
+              ),
+              const Divider(height: 24),
+              _buildBatasItem(
+                context: context,
+                icon: Icons.view_week,
+                title: 'Mingguan',
+                value: batasProvider.batasMingguan,
+                color: AppColors.primary,
+                onChanged: (value) => batasProvider.setBatasMingguan(value),
+              ),
+              const Divider(height: 24),
+              _buildBatasItem(
+                context: context,
+                icon: Icons.calendar_month,
+                title: 'Bulanan',
+                value: batasProvider.batasBulanan,
+                color: AppColors.success,
+                onChanged: (value) => batasProvider.setBatasBulanan(value),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBatasItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required int value,
+    required Color color,
+    required Function(int) onChanged,
+  }) {
+    final controller = TextEditingController(text: value.toString());
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: AppTextStyles.captionContext(context)),
+              const SizedBox(height: 4),
+              Text(
+                'Rp ${value.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                style: AppTextStyles.bodyContext(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.edit_outlined, size: 18),
+          color: AppColors.primary,
+          onPressed: () => _showEditBatasDialog(
+            context: context,
+            title: 'Atur Batas $title',
+            controller: controller,
+            color: color,
+            onSave: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showEditBatasDialog({
+    required BuildContext context,
+    required String title,
+    required TextEditingController controller,
+    required Color color,
+    required Function(int) onSave,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text(title, style: AppTextStyles.heading4Context(context)),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          style: AppTextStyles.inputContext(context),
+          decoration: InputDecoration(
+            prefixText: 'Rp ',
+            prefixStyle: AppTextStyles.bodyContext(context).copyWith(color: color),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text) ?? 0;
+              if (value > 0) {
+                onSave(value);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAboutSection(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -190,7 +343,7 @@ class PengaturanScreen extends StatelessWidget {
                 children: [
                   Text(
                     'Aplikasi pencatatan keuangan pribadi yang mudah digunakan.',
-                    style: AppTextStyles.body,
+                    style: AppTextStyles.bodyContext(context),
                   ),
                 ],
               );
@@ -201,7 +354,7 @@ class PengaturanScreen extends StatelessWidget {
             context: context,
             icon: Icons.code_rounded,
             title: 'Versi',
-            trailing: Text('1.0.0', style: AppTextStyles.bodySmall),
+            trailing: Text('1.0.0', style: AppTextStyles.bodySmallContext(context)),
           ),
         ],
       ),
@@ -219,12 +372,12 @@ class PengaturanScreen extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppColors.greyLight,
+          color: AppColors.forBrightness(context, AppColors.greyLight, AppColors.greyLightDark),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: AppColors.grey, size: 22),
       ),
-      title: Text(title, style: AppTextStyles.body),
+      title: Text(title, style: AppTextStyles.bodyContext(context)),
       trailing: trailing ?? const Icon(Icons.chevron_right, color: AppColors.grey),
       onTap: onTap,
     );

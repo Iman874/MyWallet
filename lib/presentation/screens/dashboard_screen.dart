@@ -4,9 +4,12 @@ import '../providers/transaksi_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../widgets/empty_state_widget.dart';
+import '../widgets/skeleton_loading.dart';
+import '../widgets/notifikasi_badge.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'tambah_transaksi_screen.dart';
+import 'detail_transaksi_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -21,25 +24,14 @@ class DashboardScreen extends StatelessWidget {
           StickyHeader(
             title: 'UangKu',
             subtitle: 'Kelola keuanganmu dengan mudah',
-            trailing: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Icons.notifications_outlined,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                size: 22,
-              ),
-            ),
+            trailing: const NotifikasiBadge(),
           ),
           // Scrollable Content
           Expanded(
             child: Consumer<TransaksiProvider>(
               builder: (context, provider, child) {
                 if (provider.isLoading && provider.list.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const SkeletonDashboard();
                 }
 
                 return SingleChildScrollView(
@@ -231,15 +223,15 @@ class DashboardScreen extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -249,25 +241,34 @@ class DashboardScreen extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: color, size: 16),
+                child: Icon(icon, color: color, size: 14),
               ),
-              const SizedBox(width: 10),
-              Text(label, style: AppTextStyles.caption),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTextStyles.caption.copyWith(fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
             style: AppTextStyles.jumlah.copyWith(
               color: color,
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -308,7 +309,17 @@ class DashboardScreen extends StatelessWidget {
           )
         else
           ...provider.list.take(5).map(
-            (transaksi) => TransaksiListItem(transaksi: transaksi),
+            (transaksi) => TransaksiListItem(
+              transaksi: transaksi,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetailTransaksiScreen(transaksi: transaksi),
+                  ),
+                );
+              },
+            ),
           ),
       ],
     );

@@ -7,6 +7,8 @@ class KategoriProvider extends ChangeNotifier {
   final KategoriRepository _repository;
 
   List<Kategori> _list = [];
+  List<Kategori> _listPemasukan = [];
+  List<Kategori> _listPengeluaran = [];
   bool _isLoading = false;
   String? _error;
 
@@ -14,6 +16,8 @@ class KategoriProvider extends ChangeNotifier {
       : _repository = repository ?? KategoriRepositoryImpl();
 
   List<Kategori> get list => _list;
+  List<Kategori> get listPemasukan => _listPemasukan;
+  List<Kategori> get listPengeluaran => _listPengeluaran;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -24,6 +28,8 @@ class KategoriProvider extends ChangeNotifier {
 
     try {
       _list = await _repository.getAll();
+      _listPemasukan = await _repository.getByTipe('pemasukan');
+      _listPengeluaran = await _repository.getByTipe('pengeluaran');
     } catch (e) {
       _error = e.toString();
     } finally {

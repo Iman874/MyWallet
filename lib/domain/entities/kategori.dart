@@ -4,6 +4,7 @@ class Kategori {
   final String icon;
   final String warna;
   final bool isDefault;
+  final String tipe; // 'pemasukan' atau 'pengeluaran'
 
   const Kategori({
     this.id,
@@ -11,6 +12,7 @@ class Kategori {
     required this.icon,
     required this.warna,
     this.isDefault = false,
+    this.tipe = 'pengeluaran',
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class Kategori {
       'icon': icon,
       'warna': warna,
       'isDefault': isDefault ? 1 : 0,
+      'tipe': tipe,
     };
   }
 
@@ -30,6 +33,7 @@ class Kategori {
       icon: map['icon'] as String,
       warna: map['warna'] as String,
       isDefault: (map['isDefault'] as int) == 1,
+      tipe: (map['tipe'] as String?) ?? 'pengeluaran',
     );
   }
 
@@ -39,6 +43,7 @@ class Kategori {
     String? icon,
     String? warna,
     bool? isDefault,
+    String? tipe,
   }) {
     return Kategori(
       id: id ?? this.id,
@@ -46,6 +51,7 @@ class Kategori {
       icon: icon ?? this.icon,
       warna: warna ?? this.warna,
       isDefault: isDefault ?? this.isDefault,
+      tipe: tipe ?? this.tipe,
     );
   }
 }

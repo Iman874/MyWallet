@@ -5,6 +5,7 @@ import 'app_colors.dart';
 class AppTextStyles {
   AppTextStyles._();
 
+  // Base text styles (light theme default)
   static TextStyle heading1 = GoogleFonts.poppins(
     fontSize: 28,
     fontWeight: FontWeight.bold,
@@ -87,5 +88,46 @@ class AppTextStyles {
     fontSize: 16,
     fontWeight: FontWeight.normal,
     color: AppColors.textPrimary,
+  );
+
+  // Context-aware methods for dark mode support
+  static TextStyle heading1Context(BuildContext context) => heading1.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
+  );
+
+  static TextStyle heading2Context(BuildContext context) => heading2.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
+  );
+
+  static TextStyle heading3Context(BuildContext context) => heading3.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
+  );
+
+  static TextStyle heading4Context(BuildContext context) => heading4.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
+  );
+
+  static TextStyle bodyContext(BuildContext context) => body.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
+  );
+
+  static TextStyle bodySmallContext(BuildContext context) => bodySmall.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textSecondary, AppColors.textSecondaryDark),
+  );
+
+  static TextStyle captionContext(BuildContext context) => caption.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textSecondary, AppColors.textSecondaryDark),
+  );
+
+  static TextStyle jumlahContext(BuildContext context) => jumlah.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
+  );
+
+  static TextStyle labelContext(BuildContext context) => label.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textSecondary, AppColors.textSecondaryDark),
+  );
+
+  static TextStyle inputContext(BuildContext context) => input.copyWith(
+    color: AppColors.forBrightness(context, AppColors.textPrimary, AppColors.textPrimaryDark),
   );
 }

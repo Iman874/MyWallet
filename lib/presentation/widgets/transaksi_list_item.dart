@@ -7,12 +7,14 @@ import '../../domain/entities/transaksi.dart';
 class TransaksiListItem extends StatelessWidget {
   final Transaksi transaksi;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   const TransaksiListItem({
     super.key,
     required this.transaksi,
     this.onTap,
+    this.onEdit,
     this.onDelete,
   });
 
@@ -89,6 +91,14 @@ class TransaksiListItem extends StatelessWidget {
               '$prefix${formatter.format(transaksi.jumlah)}',
               style: AppTextStyles.jumlah.copyWith(color: color),
             ),
+            if (onEdit != null) ...[
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 20),
+                color: AppColors.primary,
+                onPressed: onEdit,
+              ),
+            ],
             if (onDelete != null) ...[
               const SizedBox(width: 4),
               IconButton(
