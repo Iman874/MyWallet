@@ -6,7 +6,11 @@ import '../widgets/transaksi_list_item.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_decorations.dart';
+import '../providers/toast_provider.dart';
+import '../../domain/entities/transaksi.dart';
+import '../../core/utils/format.dart';
 import 'detail_transaksi_screen.dart';
+import 'tambah_transaksi_screen.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -156,28 +160,37 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
   Widget _buildMonthPicker(List<String> months) {
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.55,
+      ),
       padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('Pilih Bulan', style: AppTextStyles.heading4),
           const SizedBox(height: 16),
-          ...List.generate(12, (index) {
-            final month = index + 1;
-            return ListTile(
-              title: Text(months[index]),
-              trailing: _selectedMonth == month
-                  ? const Icon(Icons.check_circle, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                setState(() {
-                  _selectedMonth = month;
-                });
-                context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
-                Navigator.pop(context);
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: 12,
+              itemBuilder: (context, index) {
+                final month = index + 1;
+                return ListTile(
+                  title: Text(months[index]),
+                  trailing: _selectedMonth == month
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedMonth = month;
+                    });
+                    context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+                    Navigator.pop(context);
+                  },
+                );
               },
-            );
-          }),
+            ),
+          ),
         ],
       ),
     );
@@ -268,8 +281,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             final item = provider.list[index];
             return TransaksiListItem(
               transaksi: item,
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailTransaksiScreen(transaksi: item),
@@ -277,7 +290,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 );
               },
               onEdit: () => _showEditDialog(item),
-              onDelete: () => _showDeleteDialog(item.id!),
+              onDelete: () => _showDeleteDialog(item),
             );
           },
         );
@@ -285,46 +298,16 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     );
   }
 
-  void _showEditDialog(dynamic transaksi) {
-    final catatanController = TextEditingController(text: transaksi.catatan ?? '');
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Edit Catatan', style: AppTextStyles.heading4),
-        content: TextField(
-          controller: catatanController,
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Masukkan catatan...',
-            hintStyle: AppTextStyles.input.copyWith(color: AppColors.grey),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<TransaksiProvider>().updateCatatan(
-                transaksi.id!,
-                catatanController.text,
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
+  void _showEditDialog(Transaksi transaksi) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TambahTransaksiScreen(transaksi: transaksi),
       ),
     );
   }
 
-  void _showDeleteDialog(int id) {
+  void _showDeleteDialog(Transaksi item) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -339,7 +322,11 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           ElevatedButton(
             style: AppDecorations.errorButtonStyle,
             onPressed: () {
-              context.read<TransaksiProvider>().delete(id);
+              context.read<TransaksiProvider>().delete(item.id!);
+              context.read<ToastProvider>().showSuccess(
+                'Transaksi berhasil dihapus',
+                '${item.kategori} — ${formatCurrencyWithPrefix(item.jumlah)}',
+              );
               Navigator.pop(context);
             },
             child: const Text('Hapus'),

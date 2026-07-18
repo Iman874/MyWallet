@@ -4,6 +4,7 @@ import '../providers/transaksi_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/format.dart';
 import '../../domain/entities/transaksi.dart';
 
 class StatistikScreen extends StatefulWidget {
@@ -343,7 +344,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
                 Text(label, style: AppTextStyles.captionContext(context).copyWith(fontSize: 11)),
                 const SizedBox(height: 4),
                 Text(
-                  'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                  'Rp ${formatCurrency(amount)}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.jumlahContext(context).copyWith(
@@ -401,7 +402,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
             Text(label, style: AppTextStyles.captionContext(context)),
             Flexible(
               child: Text(
-                'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                'Rp ${formatCurrency(amount)}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.bodySmallContext(context).copyWith(
@@ -523,7 +524,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '${transaksi.tipe == TransaksiType.pemasukan ? '+' : '-'} Rp ${transaksi.jumlah.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                    '${transaksi.tipe == TransaksiType.pemasukan ? '+' : '-'} Rp ${formatCurrency(transaksi.jumlah)}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.jumlahContext(context).copyWith(

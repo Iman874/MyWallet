@@ -6,6 +6,7 @@ import 'presentation/providers/kategori_provider.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/batas_provider.dart';
 import 'presentation/providers/notifikasi_provider.dart';
+import 'presentation/providers/toast_provider.dart';
 import 'presentation/screens/home_screen.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => BatasProvider()),
         ChangeNotifierProvider(create: (_) => NotifikasiProvider()..loadAll()),
+        ChangeNotifierProvider(create: (_) => ToastProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

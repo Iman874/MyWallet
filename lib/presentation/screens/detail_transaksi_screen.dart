@@ -2,18 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/transaksi_provider.dart';
+import '../providers/toast_provider.dart';
 import '../../domain/entities/transaksi.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/format.dart';
+import 'tambah_transaksi_screen.dart';
 
-class DetailTransaksiScreen extends StatelessWidget {
+class DetailTransaksiScreen extends StatefulWidget {
   final Transaksi transaksi;
 
   const DetailTransaksiScreen({super.key, required this.transaksi});
 
   @override
+  State<DetailTransaksiScreen> createState() => _DetailTransaksiScreenState();
+}
+
+class _DetailTransaksiScreenState extends State<DetailTransaksiScreen> {
+  late Transaksi _transaksi;
+
+  @override
+  void initState() {
+    super.initState();
+    _transaksi = widget.transaksi;
+  }
+
+  void _refreshTransaksi() {
+    final provider = context.read<TransaksiProvider>();
+    final found = provider.list.where((t) => t.id == _transaksi.id).toList();
+    if (found.isNotEmpty) {
+      setState(() {
+        _transaksi = found.first;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isPemasukan = transaksi.tipe == TransaksiType.pemasukan;
+    final isPemasukan = _transaksi.tipe == TransaksiType.pemasukan;
     final tipeColor = isPemasukan ? AppColors.success : AppColors.error;
     final tipeLabel = isPemasukan ? 'Pemasukan' : 'Pengeluaran';
     final formatter = NumberFormat.currency(symbol: 'Rp ', decimalDigits: 0);
@@ -103,7 +129,7 @@ class DetailTransaksiScreen extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            isPemasukan ? '+${formatter.format(transaksi.jumlah)}' : '-${formatter.format(transaksi.jumlah)}',
+            isPemasukan ? '+${formatter.format(_transaksi.jumlah)}' : '-${formatter.format(_transaksi.jumlah)}',
             style: AppTextStyles.heading1.copyWith(
               fontSize: 32,
               color: tipeColor,
@@ -112,7 +138,7 @@ class DetailTransaksiScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            DateFormat('dd MMMM yyyy, HH:mm').format(transaksi.tanggal),
+            DateFormat('dd MMMM yyyy, HH:mm').format(_transaksi.tanggal),
             style: AppTextStyles.bodySmallContext(context),
           ),
         ],
@@ -140,14 +166,14 @@ class DetailTransaksiScreen extends StatelessWidget {
         children: [
           Text('Informasi', style: AppTextStyles.heading4Context(context)),
           const SizedBox(height: 16),
-          _buildInfoRow(context, Icons.category_outlined, 'Kategori', transaksi.kategori),
+          _buildInfoRow(context, Icons.category_outlined, 'Kategori', _transaksi.kategori),
           const Divider(height: 24),
-          _buildInfoRow(context, Icons.calendar_today, 'Tanggal', DateFormat('dd MMMM yyyy').format(transaksi.tanggal)),
+          _buildInfoRow(context, Icons.calendar_today, 'Tanggal', DateFormat('dd MMMM yyyy').format(_transaksi.tanggal)),
           const Divider(height: 24),
-          _buildInfoRow(context, Icons.access_time, 'Waktu', DateFormat('HH:mm').format(transaksi.tanggal)),
-          if (transaksi.catatan != null && transaksi.catatan!.isNotEmpty) ...[
+          _buildInfoRow(context, Icons.access_time, 'Waktu', DateFormat('HH:mm').format(_transaksi.tanggal)),
+          if (_transaksi.catatan != null && _transaksi.catatan!.isNotEmpty) ...[
             const Divider(height: 24),
-            _buildInfoRow(context, Icons.notes, 'Catatan', transaksi.catatan!),
+            _buildInfoRow(context, Icons.notes, 'Catatan', _transaksi.catatan!),
           ],
         ],
       ),
@@ -208,7 +234,7 @@ class DetailTransaksiScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () => _showEditDialog(context),
+              onPressed: () => _navigateToEdit(context),
               icon: const Icon(Icons.edit_outlined, size: 18),
               label: const Text('Edit'),
               style: ElevatedButton.styleFrom(
@@ -226,46 +252,16 @@ class DetailTransaksiScreen extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context) {
-    final catatanController = TextEditingController(text: transaksi.catatan ?? '');
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Theme.of(context).cardColor,
-        title: Text('Edit Catatan', style: AppTextStyles.heading4Context(context)),
-        content: TextField(
-          controller: catatanController,
-          maxLines: 3,
-          style: AppTextStyles.inputContext(context),
-          decoration: InputDecoration(
-            hintText: 'Masukkan catatan...',
-            hintStyle: AppTextStyles.bodyContext(context).copyWith(color: AppColors.grey),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<TransaksiProvider>().updateCatatan(
-                transaksi.id!,
-                catatanController.text,
-              );
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
+  Future<void> _navigateToEdit(BuildContext context) async {
+    final result = await Navigator.push<Transaksi>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TambahTransaksiScreen(transaksi: _transaksi),
       ),
     );
+    if (result != null) {
+      _refreshTransaksi();
+    }
   }
 
   void _showDeleteDialog(BuildContext context) {
@@ -287,7 +283,11 @@ class DetailTransaksiScreen extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              context.read<TransaksiProvider>().delete(transaksi.id!);
+              context.read<TransaksiProvider>().delete(_transaksi.id!);
+              context.read<ToastProvider>().showSuccess(
+                'Transaksi berhasil dihapus',
+                '${_transaksi.kategori} — ${formatCurrencyWithPrefix(_transaksi.jumlah)}',
+              );
               Navigator.pop(context);
               Navigator.pop(context);
             },

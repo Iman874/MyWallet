@@ -6,14 +6,18 @@ import '../providers/transaksi_provider.dart';
 import '../providers/kategori_provider.dart';
 import '../providers/batas_provider.dart';
 import '../providers/notifikasi_provider.dart';
+import '../providers/toast_provider.dart';
 import '../../domain/entities/transaksi.dart';
 import '../../domain/entities/kategori.dart';
 import '../../domain/services/notifikasi_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/format.dart';
 
 class TambahTransaksiScreen extends StatefulWidget {
-  const TambahTransaksiScreen({super.key});
+  final Transaksi? transaksi;
+
+  const TambahTransaksiScreen({super.key, this.transaksi});
 
   @override
   State<TambahTransaksiScreen> createState() => _TambahTransaksiScreenState();
@@ -29,6 +33,8 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
   bool _isCatatanFocused = false;
   List<Kategori> _kategoriList = [];
 
+  bool get _isEditMode => widget.transaksi != null;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +43,16 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
         _isCatatanFocused = _catatanFocusNode.hasFocus;
       });
     });
+    if (_isEditMode) {
+      final t = widget.transaksi!;
+      _amount = t.jumlah.toString();
+      _selectedDate = t.tanggal;
+      _selectedKategori = t.kategori;
+      _selectedTipe = t.tipe;
+      if (t.catatan != null) {
+        _catatanController.text = t.catatan!;
+      }
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadKategori();
     });
@@ -114,31 +130,44 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
     final transaksiProvider = context.read<TransaksiProvider>();
     final batasProvider = context.read<BatasProvider>();
     final notifikasiProvider = context.read<NotifikasiProvider>();
+    final toastProvider = context.read<ToastProvider>();
 
-    await transaksiProvider.add(transaksi);
+    if (_isEditMode) {
+      final updated = transaksi.copyWith(id: widget.transaksi!.id);
+      await transaksiProvider.update(updated);
+      if (mounted) {
+        toastProvider.showSuccess(
+          'Transaksi berhasil diperbarui',
+          '${updated.kategori} — ${formatCurrencyWithPrefix(updated.jumlah)}',
+        );
+        Navigator.pop(context, updated);
+      }
+    } else {
+      await transaksiProvider.add(transaksi);
 
-    // Cek batas dan buat notifikasi jika melebihi
-    if (transaksi.tipe == TransaksiType.pengeluaran) {
-      final service = NotifikasiService(
-        transaksiProvider: transaksiProvider,
-        batasProvider: batasProvider,
-        notifikasiProvider: notifikasiProvider,
-      );
-      await service.cekDanBuatNotifikasi(transaksi);
-    }
+      if (transaksi.tipe == TransaksiType.pengeluaran) {
+        final service = NotifikasiService(
+          transaksiProvider: transaksiProvider,
+          batasProvider: batasProvider,
+          notifikasiProvider: notifikasiProvider,
+        );
+        await service.cekDanBuatNotifikasi(transaksi);
+      }
 
-    if (mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        toastProvider.showSuccess(
+          'Transaksi berhasil ditambahkan',
+          '${transaksi.kategori} — ${formatCurrencyWithPrefix(transaksi.jumlah)}',
+        );
+        Navigator.pop(context);
+      }
     }
   }
 
   String get _formattedAmount {
     if (_amount.isEmpty) return '0';
     final number = int.parse(_amount);
-    return number.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]}.',
-    );
+    return formatCurrency(number);
   }
 
   @override
@@ -194,7 +223,7 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
             ),
           ),
           Text(
-            'Tambah Transaksi',
+            _isEditMode ? 'Edit Transaksi' : 'Tambah Transaksi',
             style: AppTextStyles.heading3Context(context).copyWith(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -468,35 +497,43 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.55,
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('Pilih Kategori', style: AppTextStyles.heading4Context(context)),
             const SizedBox(height: 16),
-            ..._kategoriList.map(
-              (kategori) {
-                final iconData = _getKategoriIcon(kategori.icon);
-                final color = _getKategoriColor(kategori.warna);
-                return ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _kategoriList.length,
+                itemBuilder: (context, index) {
+                  final kategori = _kategoriList[index];
+                  final iconData = _getKategoriIcon(kategori.icon);
+                  final color = _getKategoriColor(kategori.warna);
+                  return ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(iconData, color: color, size: 20),
                     ),
-                    child: Icon(iconData, color: color, size: 20),
-                  ),
-                  title: Text(kategori.nama, style: AppTextStyles.bodyContext(context)),
-                  trailing: _selectedKategori == kategori.nama
-                      ? const Icon(Icons.check_circle, color: AppColors.primary)
-                      : null,
-                  onTap: () {
-                    setState(() => _selectedKategori = kategori.nama);
-                    Navigator.pop(context);
-                  },
-                );
-              },
+                    title: Text(kategori.nama, style: AppTextStyles.bodyContext(context)),
+                    trailing: _selectedKategori == kategori.nama
+                        ? const Icon(Icons.check_circle, color: AppColors.primary)
+                        : null,
+                    onTap: () {
+                      setState(() => _selectedKategori = kategori.nama);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 20),
           ],

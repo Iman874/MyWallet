@@ -8,8 +8,10 @@ import '../widgets/skeleton_loading.dart';
 import '../widgets/notifikasi_badge.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/format.dart';
 import 'tambah_transaksi_screen.dart';
 import 'detail_transaksi_screen.dart';
+import 'home_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -39,7 +41,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSaldoCard(provider.saldo),
+                      _buildSaldoCard(context, provider.saldo),
                       const SizedBox(height: 24),
                       _buildRingkasanHarian(
                         context,
@@ -93,7 +95,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaldoCard(int saldo) {
+  Widget _buildSaldoCard(BuildContext context, int saldo) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
@@ -138,36 +140,42 @@ class DashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Rp ${saldo.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                'Rp ${formatCurrency(saldo)}',
                 style: AppTextStyles.saldo.copyWith(
                   fontSize: 36,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.visibility_outlined,
-                      color: AppColors.white.withValues(alpha: 0.9),
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Lihat Detail',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w500,
+              GestureDetector(
+                onTap: () {
+                  final homeState = context.findAncestorStateOfType<HomeScreenState>();
+                  homeState?.switchToTab(1);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.visibility_outlined,
+                        color: AppColors.white.withValues(alpha: 0.9),
+                        size: 16,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Text(
+                        'Lihat Detail',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -261,7 +269,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+            'Rp ${formatCurrency(amount)}',
             style: AppTextStyles.jumlah.copyWith(
               color: color,
               fontSize: 16,

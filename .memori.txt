@@ -1,5 +1,115 @@
 ==================================================
 Tanggal : 2026-07-18
+Waktu   : 17:00
+Kategori: Feature
+
+Judul:
+v0.8 - Modern Splash Screen dengan Animated Wallet Logo
+
+Detail:
+- Task 1: Setup Dependencies & Assets (flutter_svg, SVG files)
+- Task 2: Buat WalletLogo Widget (fade in + breathing animation)
+- Task 3: Buat CoinAnimation Widget (bouncing + squash + rotation)
+- Task 4: Buat LoadingDots Widget (3 animated dots)
+- Task 5: Buat SplashScreen Screen (gradient, sparkle, fade transition)
+- Task 6: Integrasi & Final Verify (update main.dart, flutter analyze/test)
+
+Dampak:
+- Splash screen premium fintech saat app pertama kali dibuka
+- Animasi wallet, coin bouncing, loading dots
+- Fade transition ke HomeScreen setelah 2 detik
+- Reusable widgets: WalletLogo, CoinAnimation, LoadingDots
+==================================================
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 17:15
+Kategori: Bug
+
+Judul:
+Perbaikan: edit riwayat, overflow nominal, toast posisi, grey lebih gelap, format utility
+
+Detail:
+- Bug edit di RiwayatScreen: `_showEditDialog` masih dialog catatan lama → diubah jadi navigasi ke `TambahTransaksiScreen(transaksi:)` untuk edit penuh
+- Bug RenderFlex overflow di bottom sheet (Pilih Kategori & Pilih Bulan): item di-spread langsung di `Column` → di-fix pakai `Flexible` + `ListView.builder` + `maxHeight: 0.55`
+- Bug overflow nominal di TransaksiListItem: amount text wrap → di-fix `Flexible` + `maxLines: 1` + `TextOverflow.ellipsis`
+- Bug toast posisi kiri atas: ToastStack dipindah dari dalam Stack body ke luar sebagai overlay full-screen
+- Grey color terlalu terang (#9E9E9E → #757575)
+- Bottom nav: gradient diganti putih dengan efek BackdropFilter blur, edge-to-edge, bottom overflow, rounded hanya atas
+- Dibuat `lib/core/utils/format.dart` — formatCurrency() & formatCurrencyWithPrefix()
+- Semua manual replaceAllMapped di 10 file diganti dengan format utility
+- flutter analyze: 0 error
+- flutter test: 50/50 pass
+
+Dampak:
+- Edit di tab Riwayat sekarang buka form penuh (sama dengan Tambah)
+- Bottom sheet tidak overflow walau banyak kategori/bulan
+- Nominal panjang tidak pecah di card riwayat
+- Toast muncul di kanan atas dengan benar
+- Grey lebih terbaca
+- Format rupiah reusable via utility
+==================================================
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 16:30
+Kategori: Feature
+
+Judul:
+v0.7 - Lihat Detail, Edit Transaksi Penuh, Toast Notification selesai
+
+Detail:
+- Task 1: Lihat Detail + Edit Transaksi Penuh ✅
+  - Tombol "Lihat Detail" di SaldoCard → switch ke tab Riwayat (home_screen.switchToTab)
+  - DetailTransaksiScreen jadi StatefulWidget, tombol Edit navigasi ke TambahTransaksiScreen(transaksi:)
+  - TambahTransaksiScreen: mode edit dengan pre-fill data, judul dinamis, submit panggil update()
+  - Setelah edit berhasil → pop ke DetailTransaksiScreen dengan data baru
+- Task 2: Toast Notification System ✅
+  - ToastProvider (ChangeNotifier): antrian max 3, auto-dismiss 3 detik, helper showSuccess/Error/Warning/Info
+  - ToastWidget: card overlay dengan icon, title, message, warna sesuai tipe, tap to dismiss
+  - ToastStack: Positioned top-right, Consumer<ToastProvider>
+  - Terdaftar di main.dart MultiProvider
+- Task 3: Integrasi Toast + Final Verify ✅
+  - RiwayatScreen: toast sukses hapus transaksi
+  - DetailTransaksiScreen: toast sukses edit, konfirmasi hapus
+  - flutter analyze: 0 error
+  - flutter test: 50/50 pass
+
+Dampak:
+- Edit transaksi penuh via form yang sama dengan Tambah
+- Navigasi "Lihat Detail" dari dashboard langsung ke tab Riwayat
+- Toast notification: kanan atas, max 3, auto-dismiss, 4 tipe
+- Format rupiah dengan titik ribuan
+==================================================
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 15:45
+Kategori: Bug
+
+Judul:
+Perbaikan bug & finalisasi v0.6 - Task 6 selesai
+
+Detail:
+- Fix bug StatistikScreen: ringkasan bulanan dihitung dari `provider.list` (data bulan terpilih), bukan `ringkasanHarian` (data hari ini)
+- Fix warning `_showEditDialog` unused: tambah tombol edit di `TransaksiListItem` + wire ke `riwayat_screen.dart`
+- Fix kategori hardcoded di form Tambah Transaksi: sekarang pakai `KategoriProvider` dinamis, filter sesuai tipe (pemasukan/pengeluaran)
+- Fix info `use_null_aware_elements` di `sticky_header.dart` pakai `?` syntax
+- Fix info `use_build_context_synchronously` di `tambah_transaksi_screen.dart` (capture providers before await)
+- v0.6 Task 6 (Test & Final Verify): ✅ SELESAI
+  - notifikasi_repository_test.dart (9 test)
+  - notifikasi_provider_test.dart (5 test)
+  - batas_provider_test.dart (6 test)
+  - Update screen test dashboard & tambah_transaksi dengan MultiProvider lengkap
+- flutter analyze: 0 error, 0 warning, 0 info
+- flutter test: 50/50 pass (sebelumnya 29)
+- Commit: `d5a4ca2` - "fix bug & add feature: perbaikan bug, kategori dinamis, dan test v0.6"
+
+Dampak:
+- Semua fitur MVP Fase 1 complete termasuk test
+- Kategori kustom muncul di form Tambah Transaksi
+- StatistikScreen menampilkan data bulan yang dipilih dengan benar
+- RiwayatScreen ada tombol edit catatan langsung
+==================================================
+==================================================
+Tanggal : 2026-07-18
 Waktu   : 14:30
 Kategori: Feature
 
@@ -8,12 +118,12 @@ Plan v0.6 Detail Transaksi & Notifikasi dibuat
 
 Detail:
 - 6 task untuk fitur baru:
-  - Task 1: Database & Model Notifikasi (tabel notifikasi, entity, repository)
-  - Task 2: Detail Transaksi Screen (tap transaksi di dashboard → detail)
-  - Task 3: Pengaturan Batas Pemakaian (harian/mingguan/bulanan di SharedPreferences)
-  - Task 4: Logika Notifikasi Otomatis (cek batas saat tambah pengeluaran)
-  - Task 5: Halaman Notifikasi & Badge (ikon notifikasi di dashboard)
-  - Task 6: Test & Final Verify
+  - Task 1: Database & Model Notifikasi ✅
+  - Task 2: Detail Transaksi Screen ✅
+  - Task 3: Pengaturan Batas Pemakaian ✅
+  - Task 4: Logika Notifikasi Otomatis ✅
+  - Task 5: Halaman Notifikasi & Badge ✅
+  - Task 6: Test & Final Verify ✅
 - Default batas: Harian Rp 200.000, Mingguan Rp 1.500.000, Bulanan Rp 5.000.000
 - Notifikasi in-app (bukan push notification)
 - Database version naik ke 4

@@ -85,11 +85,14 @@ class TransaksiListItem extends StatelessWidget {
           ],
         ),
         trailing: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              '$prefix${formatter.format(transaksi.jumlah)}',
-              style: AppTextStyles.jumlah.copyWith(color: color),
+            Flexible(
+              child: Text(
+                '$prefix${formatter.format(transaksi.jumlah)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.jumlah.copyWith(color: color),
+              ),
             ),
             if (onEdit != null) ...[
               const SizedBox(width: 4),

@@ -6,6 +6,7 @@ import '../providers/batas_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/format.dart';
 
 class PengaturanScreen extends StatelessWidget {
   const PengaturanScreen({super.key});
@@ -234,7 +235,7 @@ class PengaturanScreen extends StatelessWidget {
               Text(title, style: AppTextStyles.captionContext(context)),
               const SizedBox(height: 4),
               Text(
-                'Rp ${value.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                'Rp ${formatCurrency(value)}',
                 style: AppTextStyles.bodyContext(context).copyWith(
                   fontWeight: FontWeight.w600,
                   color: color,

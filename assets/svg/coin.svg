@@ -1,0 +1,16 @@
+<svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <!-- Coin shadow -->
+  <ellipse cx="25" cy="45" rx="18" ry="4" fill="#FFC83D" opacity="0.3"/>
+  
+  <!-- Coin body -->
+  <circle cx="25" cy="25" r="20" fill="#FFC83D"/>
+  
+  <!-- Coin highlight -->
+  <circle cx="20" cy="20" r="8" fill="#FFE483" opacity="0.6"/>
+  
+  <!-- Coin inner circle -->
+  <circle cx="25" cy="25" r="14" fill="none" stroke="#FFB020" stroke-width="2"/>
+  
+  <!-- Dollar sign -->
+  <text x="25" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#FF9800">$</text>
+</svg>
