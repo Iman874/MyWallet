@@ -62,18 +62,18 @@ flutter run
 
 Tangkapan layar (screenshot) antarmuka UangKu tersimpan di folder:
 
-> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
+> 🗂️ **`preview/`** (root project MyWallet)
 
 | Tampilan | File | Keterangan |
 |---|---|---|
-| Dasbor Keuangan | `uangku-dashboard.jpeg` | Saldo terkini, ringkasan harian, transaksi terbaru |
-| Catat Transaksi | `uangku-tambah.jpeg` | Form pemasukan / pengeluaran |
-| Riwayat | `uangku-riwayat.jpeg` | Daftar & filter transaksi bulanan |
-| Statistik | `uangku-statistik.jpeg` | Pie chart per kategori |
-| Kategori & Budget | `uangku-kategori.jpeg` | Kategori custom + progress budget |
-| Pengaturan | `uangku-pengaturan.jpeg` | Ekspor / impor data, tema |
-| Notifikasi | `uangku-notifikasi.jpeg` | Peringatan batas & budget |
-| Splash | `uangku-splash.jpeg` | Animated wallet logo & coin animation |
+| Dasbor Keuangan | `preview/dashboard.jpeg` | Saldo terkini, ringkasan harian, transaksi terbaru |
+| Catat Transaksi | `preview/tambah.jpeg` | Form pemasukan / pengeluaran |
+| Riwayat | `preview/riwayat.jpeg` | Daftar & filter transaksi bulanan |
+| Statistik | `preview/statistik.jpeg` | Pie chart per kategori |
+| Kategori & Budget | `preview/kategori.jpeg` | Kategori custom + progress budget |
+| Pengaturan | `preview/pengaturan.jpeg` | Ekspor / impor data, tema |
+| Notifikasi | `preview/notifikasi.jpeg` | Peringatan batas & budget |
+| Splash | `preview/splash.jpeg` | Animated wallet logo & coin animation |
 
 ---
 

@@ -62,18 +62,18 @@ flutter run
 
 Screenshots of the UangKu interface are stored in the folder:
 
-> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
+> 🗂️ **`preview/`** (MyWallet project root)
 
 | Screen | File | Description |
 |---|---|---|
-| Dashboard | `uangku-dashboard.jpeg` | Current balance, daily summary, latest transactions |
-| Add Transaction | `uangku-tambah.jpeg` | Income / expense form |
-| History | `uangku-riwayat.jpeg` | Transaction list & monthly filter |
-| Statistics | `uangku-statistik.jpeg` | Pie chart by category |
-| Categories & Budget | `uangku-kategori.jpeg` | Custom categories + budget progress |
-| Settings | `uangku-pengaturan.jpeg` | Export / import data, theme |
-| Notifications | `uangku-notifikasi.jpeg` | Limit & budget alerts |
-| Splash | `uangku-splash.jpeg` | Animated wallet logo & coin animation |
+| Dashboard | `preview/dashboard.jpeg` | Current balance, daily summary, latest transactions |
+| Add Transaction | `preview/tambah.jpeg` | Income / expense form |
+| History | `preview/riwayat.jpeg` | Transaction list & monthly filter |
+| Statistics | `preview/statistik.jpeg` | Pie chart by category |
+| Categories & Budget | `preview/kategori.jpeg` | Custom categories + budget progress |
+| Settings | `preview/pengaturan.jpeg` | Export / import data, theme |
+| Notifications | `preview/notifikasi.jpeg` | Limit & budget alerts |
+| Splash | `preview/splash.jpeg` | Animated wallet logo & coin animation |
 
 ---
 
