@@ -122,11 +122,11 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -242,14 +242,16 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                   Text(
                     'Belum ada transaksi\ndi bulan ini',
                     style: AppTextStyles.heading4.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Coba pilih bulan atau tahun lainnya\nuntuk melihat riwayat transaksi.',
-                    style: AppTextStyles.bodySmall,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
