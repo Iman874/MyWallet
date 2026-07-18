@@ -147,9 +147,9 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
+                  Text(label, style: AppTextStyles.captionContext(context).copyWith(fontSize: 10)),
                   const SizedBox(height: 2),
-                  Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
+                  Text(value, style: AppTextStyles.bodyContext(context).copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
                 ],
               ),
             ),
