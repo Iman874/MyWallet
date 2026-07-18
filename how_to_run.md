@@ -76,7 +76,7 @@ flutter run
 flutter build apk --release
 ```
 
-Hasil APK ada di `build/app/outputs/flutter-apk/app-release.apk`.
+Hasil APK ada di **`build/app/outputs/flutter-apk/app-release.apk`**. File ini adalah **APK siap pasang** — salin ke device Android lalu buka untuk menginstall (pastikan "Sumber tidak dikenal" diizinkan di pengaturan). Tidak perlu tool tambahan.
 
 ### Build Release (iOS) — macOS only
 

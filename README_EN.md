@@ -58,6 +58,16 @@ flutter run
 
 ---
 
+## 📦 Build APK (Installable)
+
+```powershell
+flutter build apk --release
+```
+
+The output APK is at **`build/app/outputs/flutter-apk/app-release.apk`** — this file can be installed directly on an Android device.
+
+---
+
 ## 📸 App Preview
 
 Screenshots of the UangKu interface are stored in the folder:

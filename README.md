@@ -29,6 +29,16 @@ flutter run
 
 ---
 
+## 📦 Build APK (Siap Pasang)
+
+```powershell
+flutter build apk --release
+```
+
+Hasil APK ada di **`build/app/outputs/flutter-apk/app-release.apk`** — file ini langsung bisa dipasang (install) di device Android.
+
+---
+
 ## 📸 Preview Aplikasi
 
 Tangkapan layar (screenshot) antarmuka UangKu tersimpan di folder:
