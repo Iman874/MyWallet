@@ -90,15 +90,18 @@ flutter build ios --release
 
 Screenshot antarmuka UangKu tersimpan di folder:
 
-> 🗂️ **`/preview`**
+> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
 
 | Tampilan | File |
 |---|---|
-| Dasbor Keuangan | `uangku-dashboard.png` |
-| Catat Transaksi | `uangku-tambah.png` |
-| Riwayat | `uangku-riwayat.png` |
-| Statistik | `uangku-statistik.png` |
-| Splash Screen | `uangku-splash.png` |
+| Dasbor Keuangan | `uangku-dashboard.jpeg` |
+| Catat Transaksi | `uangku-tambah.jpeg` |
+| Riwayat | `uangku-riwayat.jpeg` |
+| Statistik | `uangku-statistik.jpeg` |
+| Kategori & Budget | `uangku-kategori.jpeg` |
+| Pengaturan | `uangku-pengaturan.jpeg` |
+| Notifikasi | `uangku-notifikasi.jpeg` |
+| Splash Screen | `uangku-splash.jpeg` |
 
 ---
 
