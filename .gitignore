@@ -1,3 +1,6 @@
+# OpenCode (local config, jangan di-commit)
+.opencode/
+
 # Miscellaneous
 *.class
 *.log
