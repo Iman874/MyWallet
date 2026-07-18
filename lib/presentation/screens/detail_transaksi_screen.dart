@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/transaksi_provider.dart';
 import '../providers/toast_provider.dart';
 import '../../domain/entities/transaksi.dart';
+import '../widgets/konfirmasi_dialog.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/format.dart';
@@ -267,33 +268,18 @@ class _DetailTransaksiScreenState extends State<DetailTransaksiScreen> {
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Theme.of(context).cardColor,
-        title: Text('Hapus Transaksi', style: AppTextStyles.heading4Context(context)),
-        content: Text('Yakin ingin menghapus transaksi ini?', style: AppTextStyles.bodyContext(context)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              context.read<TransaksiProvider>().delete(_transaksi.id!);
-              context.read<ToastProvider>().showSuccess(
-                'Transaksi berhasil dihapus',
-                '${_transaksi.kategori} — ${formatCurrencyWithPrefix(_transaksi.jumlah)}',
-              );
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Hapus'),
-          ),
-        ],
+      builder: (ctx) => KonfirmasiDialog(
+        title: 'Hapus Transaksi',
+        message: 'Yakin ingin menghapus transaksi ini?',
+        onConfirm: () {
+          context.read<TransaksiProvider>().delete(_transaksi.id!);
+          context.read<ToastProvider>().showSuccess(
+            'Transaksi berhasil dihapus',
+            '${_transaksi.kategori} — ${formatCurrencyWithPrefix(_transaksi.jumlah)}',
+          );
+          Navigator.of(ctx).pop();
+          Navigator.of(context).pop();
+        },
       ),
     );
   }

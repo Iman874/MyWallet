@@ -4,9 +4,9 @@ import '../providers/transaksi_provider.dart';
 import '../providers/kategori_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../widgets/transaksi_list_item.dart';
+import '../widgets/konfirmasi_dialog.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/theme/app_decorations.dart';
 import '../providers/toast_provider.dart';
 import '../../domain/entities/transaksi.dart';
 import '../../domain/entities/kategori.dart';
@@ -127,10 +127,10 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -141,19 +141,19 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 18),
-            const SizedBox(width: 10),
+            Icon(icon, color: AppColors.primary, size: 16),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                  Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
                   const SizedBox(height: 2),
-                  Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
                 ],
               ),
             ),
-            const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 18),
+            const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 16),
           ],
         ),
       ),
@@ -380,28 +380,18 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   void _showDeleteDialog(Transaksi item) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Hapus Transaksi', style: AppTextStyles.heading4),
-        content: Text('Yakin ingin menghapus transaksi ini?', style: AppTextStyles.body),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            style: AppDecorations.errorButtonStyle,
-            onPressed: () {
-              context.read<TransaksiProvider>().delete(item.id!);
-              context.read<ToastProvider>().showSuccess(
-                'Transaksi berhasil dihapus',
-                '${item.kategori} — ${formatCurrencyWithPrefix(item.jumlah)}',
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Hapus'),
-          ),
-        ],
+      builder: (context) => KonfirmasiDialog(
+        title: 'Hapus Transaksi',
+        message: 'Yakin ingin menghapus transaksi ini?',
+        onConfirmAsync: () async {
+          await context.read<TransaksiProvider>().delete(item.id!);
+          if (context.mounted) {
+            context.read<ToastProvider>().showSuccess(
+              'Transaksi berhasil dihapus',
+              '${item.kategori} — ${formatCurrencyWithPrefix(item.jumlah)}',
+            );
+          }
+        },
       ),
     );
   }
