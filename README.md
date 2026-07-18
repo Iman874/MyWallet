@@ -35,7 +35,7 @@ flutter run
 flutter build apk --release
 ```
 
-Hasil APK ada di **`build/app/outputs/flutter-apk/app-release.apk`** — file ini langsung bisa dipasang (install) di device Android.
+Hasil APK ada di **`build_apk/app-release.apk`** — file ini langsung bisa dipasang (install) di device Android.
 
 ---
 

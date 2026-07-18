@@ -64,7 +64,7 @@ flutter run
 flutter build apk --release
 ```
 
-The output APK is at **`build/app/outputs/flutter-apk/app-release.apk`** — this file can be installed directly on an Android device.
+The output APK is at **`build_apk/app-release.apk`** — this file can be installed directly on an Android device.
 
 ---
 

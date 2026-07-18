@@ -1,3 +1,6 @@
+# Build APK output (jangan di-commit)
+build_apk/
+
 # OpenCode (local config, jangan di-commit)
 .opencode/
 
