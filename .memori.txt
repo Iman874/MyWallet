@@ -1,5 +1,23 @@
 ==================================================
 Tanggal : 2026-07-18
+Waktu   : 17:30
+Kategori: Feature
+
+Judul:
+v0.8 - Finalisasi Splash Screen (fix struktur widget)
+
+Detail:
+- Fix: Positioned sparkle di splash_screen.dart sebelumnya ada di dalam Column (child of Center), bukan langsung di Stack → di-fix jadi direct child Stack
+- coin_animation.dart: valid di Flutter 3.38.7 (translateByDouble/scaleByDouble)
+- flutter analyze: 0 error
+- flutter test: 50/50 pass
+
+Dampak:
+- Sparkle effect muncul di posisi benar (tidak error layout)
+- Semua widget splash screen berfungsi
+==================================================
+==================================================
+Tanggal : 2026-07-18
 Waktu   : 17:00
 Kategori: Feature
 

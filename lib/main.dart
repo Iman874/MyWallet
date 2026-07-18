@@ -7,7 +7,7 @@ import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/batas_provider.dart';
 import 'presentation/providers/notifikasi_provider.dart';
 import 'presentation/providers/toast_provider.dart';
-import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            home: const HomeScreen(),
+            home: const SplashScreen(),
           );
         },
       ),

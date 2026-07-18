@@ -651,8 +651,8 @@ class _TambahTransaksiScreenState extends State<TambahTransaksiScreen> {
             height: 48,
             decoration: BoxDecoration(
               color: isAction
-                  ? (isDark ? const Color(0xFF2A2A3C) : Colors.white.withValues(alpha: 0.8))
-                  : (isDark ? const Color(0xFF2A2A3C) : Colors.white),
+                  ? (isDark ? AppColors.cardDark : Colors.white.withValues(alpha: 0.8))
+                  : (isDark ? AppColors.cardDark : Colors.white),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(

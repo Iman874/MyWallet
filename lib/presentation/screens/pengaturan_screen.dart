@@ -159,146 +159,272 @@ class PengaturanScreen extends StatelessWidget {
   Widget _buildBatasSection(BuildContext context) {
     return Consumer<BatasProvider>(
       builder: (context, batasProvider, child) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _buildBatasItem(
-                context: context,
-                icon: Icons.today,
-                title: 'Harian',
-                value: batasProvider.batasHarian,
-                color: AppColors.error,
-                onChanged: (value) => batasProvider.setBatasHarian(value),
-              ),
-              const Divider(height: 24),
-              _buildBatasItem(
-                context: context,
-                icon: Icons.view_week,
-                title: 'Mingguan',
-                value: batasProvider.batasMingguan,
-                color: AppColors.primary,
-                onChanged: (value) => batasProvider.setBatasMingguan(value),
-              ),
-              const Divider(height: 24),
-              _buildBatasItem(
-                context: context,
-                icon: Icons.calendar_month,
-                title: 'Bulanan',
-                value: batasProvider.batasBulanan,
-                color: AppColors.success,
-                onChanged: (value) => batasProvider.setBatasBulanan(value),
-              ),
-            ],
-          ),
+        return Column(
+          children: [
+            _buildBatasCard(
+              context: context,
+              icon: Icons.today,
+              title: 'Harian',
+              tag: 'per hari',
+              value: batasProvider.batasHarian,
+              color: AppColors.error,
+              onChanged: (value) => batasProvider.setBatasHarian(value),
+            ),
+            const SizedBox(height: 12),
+            _buildBatasCard(
+              context: context,
+              icon: Icons.view_week,
+              title: 'Mingguan',
+              tag: 'per minggu',
+              value: batasProvider.batasMingguan,
+              color: AppColors.primary,
+              onChanged: (value) => batasProvider.setBatasMingguan(value),
+            ),
+            const SizedBox(height: 12),
+            _buildBatasCard(
+              context: context,
+              icon: Icons.calendar_month,
+              title: 'Bulanan',
+              tag: 'per bulan',
+              value: batasProvider.batasBulanan,
+              color: AppColors.success,
+              onChanged: (value) => batasProvider.setBatasBulanan(value),
+            ),
+          ],
         );
       },
     );
   }
 
-  Widget _buildBatasItem({
+  Widget _buildBatasCard({
     required BuildContext context,
     required IconData icon,
     required String title,
+    required String tag,
     required int value,
     required Color color,
     required Function(int) onChanged,
   }) {
-    final controller = TextEditingController(text: value.toString());
-
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: AppTextStyles.captionContext(context)),
-              const SizedBox(height: 4),
-              Text(
-                'Rp ${formatCurrency(value)}',
-                style: AppTextStyles.bodyContext(context).copyWith(
-                  fontWeight: FontWeight.w600,
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4, 16, 16, 16),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.bodyContext(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Rp ${formatCurrency(value)} / $tag',
+                    style: AppTextStyles.captionContext(context).copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 32, height: 32,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                color: AppColors.primary,
+                onPressed: () => _showEditBatasDialog(
+                  context: context,
+                  title: 'Atur Batas $title',
+                  currentValue: value,
                   color: color,
+                  onSave: onChanged,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        IconButton(
-          icon: const Icon(Icons.edit_outlined, size: 18),
-          color: AppColors.primary,
-          onPressed: () => _showEditBatasDialog(
-            context: context,
-            title: 'Atur Batas $title',
-            controller: controller,
-            color: color,
-            onSave: onChanged,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   void _showEditBatasDialog({
     required BuildContext context,
     required String title,
-    required TextEditingController controller,
+    required int currentValue,
     required Color color,
     required Function(int) onSave,
   }) {
+    final controller = TextEditingController(text: currentValue.toString());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: Theme.of(context).cardColor,
-        title: Text(title, style: AppTextStyles.heading4Context(context)),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: AppTextStyles.inputContext(context),
-          decoration: InputDecoration(
-            prefixText: 'Rp ',
-            prefixStyle: AppTextStyles.bodyContext(context).copyWith(color: color),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+        titlePadding: EdgeInsets.zero,
+        title: Container(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.08),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.edit_outlined, color: color, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: AppTextStyles.heading4Context(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1A1A2E) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Rp',
+                      style: AppTextStyles.bodyContext(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: StatefulBuilder(
+                        builder: (context, setDialogState) {
+                          return TextField(
+                            controller: controller,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            style: AppTextStyles.inputContext(context).copyWith(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            onChanged: (value) {
+                              setDialogState(() {});
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (controller.text.isNotEmpty && int.tryParse(controller.text) != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    '= Rp ${formatCurrency(int.parse(controller.text))}',
+                    style: AppTextStyles.captionContext(context).copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text) ?? 0;
-              if (value > 0) {
-                onSave(value);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Simpan'),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text('Batal', style: AppTextStyles.bodyContext(context)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final value = int.tryParse(controller.text) ?? 0;
+                      if (value > 0) {
+                        onSave(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Simpan'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -306,6 +432,8 @@ class PengaturanScreen extends StatelessWidget {
   }
 
   Widget _buildAboutSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -323,6 +451,7 @@ class PengaturanScreen extends StatelessWidget {
           _buildAboutItem(
             context: context,
             icon: Icons.info_outline,
+            iconColor: isDark ? AppColors.primaryLight : AppColors.primary,
             title: 'Tentang Aplikasi',
             onTap: () {
               showAboutDialog(
@@ -354,6 +483,7 @@ class PengaturanScreen extends StatelessWidget {
           _buildAboutItem(
             context: context,
             icon: Icons.code_rounded,
+            iconColor: isDark ? AppColors.greyLightDark : AppColors.textSecondary,
             title: 'Versi',
             trailing: Text('1.0.0', style: AppTextStyles.bodySmallContext(context)),
           ),
@@ -365,21 +495,24 @@ class PengaturanScreen extends StatelessWidget {
   Widget _buildAboutItem({
     required BuildContext context,
     required IconData icon,
+    required Color iconColor,
     required String title,
     Widget? trailing,
     VoidCallback? onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppColors.forBrightness(context, AppColors.greyLight, AppColors.greyLightDark),
+          color: isDark ? iconColor.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: AppColors.grey, size: 22),
+        child: Icon(icon, color: iconColor, size: 22),
       ),
       title: Text(title, style: AppTextStyles.bodyContext(context)),
-      trailing: trailing ?? const Icon(Icons.chevron_right, color: AppColors.grey),
+      trailing: trailing ?? Icon(Icons.chevron_right, color: isDark ? Colors.grey : AppColors.textSecondary),
       onTap: onTap,
     );
   }

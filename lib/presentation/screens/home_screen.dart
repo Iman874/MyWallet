@@ -85,7 +85,7 @@ class HomeScreenState extends State<HomeScreen> {
           height: 72,
           padding: EdgeInsets.only(top: 8, bottom: MediaQuery.of(context).padding.bottom + 8),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E1E2E).withValues(alpha: 0.85) : Colors.white.withValues(alpha: 0.85),
+            color: isDark ? const Color(0xFF222238).withValues(alpha: 0.85) : Colors.white.withValues(alpha: 0.85),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),

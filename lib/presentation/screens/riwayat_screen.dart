@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
+import '../providers/kategori_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../../core/theme/app_colors.dart';
@@ -8,6 +9,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_decorations.dart';
 import '../providers/toast_provider.dart';
 import '../../domain/entities/transaksi.dart';
+import '../../domain/entities/kategori.dart';
 import '../../core/utils/format.dart';
 import 'detail_transaksi_screen.dart';
 import 'tambah_transaksi_screen.dart';
@@ -227,10 +229,15 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   }
 
   Widget _buildContent() {
-    return Consumer<TransaksiProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<TransaksiProvider, KategoriProvider>(
+      builder: (context, provider, kategoriProvider, child) {
         if (provider.isLoading) {
           return const Center(child: CircularProgressIndicator());
+        }
+
+        final kategoriMap = <String, Kategori>{};
+        for (final k in kategoriProvider.list) {
+          kategoriMap[k.nama] = k;
         }
 
         if (provider.list.isEmpty) {
@@ -274,27 +281,90 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-          itemCount: provider.list.length,
-          itemBuilder: (context, index) {
-            final item = provider.list[index];
-            return TransaksiListItem(
-              transaksi: item,
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DetailTransaksiScreen(transaksi: item),
-                  ),
-                );
-              },
-              onEdit: () => _showEditDialog(item),
-              onDelete: () => _showDeleteDialog(item),
-            );
-          },
-        );
+        return _buildGroupedList(context, provider.list, kategoriMap);
       },
+    );
+  }
+
+  Widget _buildGroupedList(BuildContext context, List<Transaksi> list, Map<String, Kategori> kategoriMap) {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final yesterdayDate = todayDate.subtract(const Duration(days: 1));
+
+    final groups = <DateTime, List<Transaksi>>{};
+    for (final t in list) {
+      final d = DateTime(t.tanggal.year, t.tanggal.month, t.tanggal.day);
+      groups.putIfAbsent(d, () => []).add(t);
+    }
+
+    final sortedDates = groups.keys.toList()..sort((a, b) => b.compareTo(a));
+
+    final allItems = <Widget>[];
+    final fullMonths = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    for (final date in sortedDates) {
+      String label;
+      if (date == todayDate) {
+        label = 'Hari Ini';
+      } else if (date == yesterdayDate) {
+        label = 'Kemarin';
+      } else {
+        label = '${date.day} ${fullMonths[date.month - 1]} ${date.year}';
+      }
+
+      allItems.add(Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 18,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ));
+
+      for (final item in groups[date]!) {
+        final kat = kategoriMap[item.kategori];
+        allItems.add(Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: TransaksiListItem(
+            transaksi: item,
+            categoryIcon: kat?.icon,
+            categoryColor: kat != null ? Color(int.parse('FF${kat.warna.replaceFirst('#', '')}', radix: 16)) : null,
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DetailTransaksiScreen(transaksi: item),
+                ),
+              );
+            },
+            onEdit: () => _showEditDialog(item),
+            onDelete: () => _showDeleteDialog(item),
+          ),
+        ));
+      }
+    }
+
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 100),
+      children: allItems,
     );
   }
 

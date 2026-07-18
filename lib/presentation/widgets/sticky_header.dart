@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
 class StickyHeader extends StatelessWidget {
@@ -15,6 +16,8 @@ class StickyHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -36,8 +39,21 @@ class StickyHeader extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Container(
+                width: 4,
+                height: 32,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4F8CFF), Color(0xFF2F6BFF)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,25 +61,25 @@ class StickyHeader extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.heading2.copyWith(
-                        fontSize: 26,
+                        fontSize: 22,
                         fontWeight: FontWeight.w700,
                         color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 4),
+                    if (subtitle case final String sub) ...[
+                      const SizedBox(height: 2),
                       Text(
-                        subtitle!,
+                        sub,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 13,
+                          color: isDark ? Colors.grey : AppColors.textSecondary,
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ],
                 ),
               ),
-              ?trailing,
+              if (trailing != null) trailing!,
             ],
           ),
         ),

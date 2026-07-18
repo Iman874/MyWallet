@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
+import '../providers/kategori_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/format.dart';
+import '../../core/utils/icon_mapper.dart';
 import '../../domain/entities/transaksi.dart';
+import '../../domain/entities/kategori.dart';
 
 class StatistikScreen extends StatefulWidget {
   const StatistikScreen({super.key});
@@ -17,6 +20,8 @@ class StatistikScreen extends StatefulWidget {
 class _StatistikScreenState extends State<StatistikScreen> {
   late int _selectedYear;
   late int _selectedMonth;
+  TransaksiType? _selectedJenis;
+  String? _selectedKategori;
 
   @override
   void initState() {
@@ -25,8 +30,24 @@ class _StatistikScreenState extends State<StatistikScreen> {
     _selectedYear = now.year;
     _selectedMonth = now.month;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+      _loadData();
     });
+  }
+
+  void _loadData() {
+    context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+    context.read<KategoriProvider>().loadAll();
+  }
+
+  List<Transaksi> _filterList(List<Transaksi> list) {
+    var filtered = list;
+    if (_selectedJenis != null) {
+      filtered = filtered.where((t) => t.tipe == _selectedJenis).toList();
+    }
+    if (_selectedKategori != null) {
+      filtered = filtered.where((t) => t.kategori == _selectedKategori).toList();
+    }
+    return filtered;
   }
 
   @override
@@ -37,7 +58,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
         children: [
           StickyHeader(
             title: 'Statistik',
-            subtitle: 'Ringkasan keuangan bulanan',
+            subtitle: 'Ringkasan keuangan',
             trailing: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -68,42 +89,86 @@ class _StatistikScreenState extends State<StatistikScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _buildFilterDropdown(
-              context: context,
-              label: 'Bulan',
-              value: months[_selectedMonth - 1],
-              icon: Icons.calendar_today,
-              onTap: () {
-                showModalBottomSheet(
+          Row(
+            children: [
+              Expanded(
+                child: _buildFilterDropdown(
                   context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  builder: (context) => _buildMonthPicker(context, months),
-                );
-              },
-            ),
+                  label: 'Bulan',
+                  value: months[_selectedMonth - 1],
+                  icon: Icons.calendar_today,
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => _buildMonthPicker(context, months),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildFilterDropdown(
+                  context: context,
+                  label: 'Tahun',
+                  value: _selectedYear.toString(),
+                  icon: Icons.calendar_today,
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => _buildYearPicker(context),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildFilterDropdown(
-              context: context,
-              label: 'Tahun',
-              value: _selectedYear.toString(),
-              icon: Icons.calendar_today,
-              onTap: () {
-                showModalBottomSheet(
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFilterDropdown(
                   context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  builder: (context) => _buildYearPicker(context),
-                );
-              },
-            ),
+                  label: 'Tipe',
+                  value: _selectedJenis == null ? 'Semua' : (_selectedJenis == TransaksiType.pemasukan ? 'Pemasukan' : 'Pengeluaran'),
+                  icon: Icons.swap_vert_rounded,
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => _buildJenisPicker(context),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildFilterDropdown(
+                  context: context,
+                  label: 'Kategori',
+                  value: _selectedKategori ?? 'Semua',
+                  icon: Icons.category_rounded,
+                  onTap: _selectedJenis == null ? null : () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => _buildKategoriPicker(context),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -115,14 +180,18 @@ class _StatistikScreenState extends State<StatistikScreen> {
     required String label,
     required String value,
     required IconData icon,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
   }) {
+    final isDisabled = onTap == null;
+
     return GestureDetector(
-      onTap: onTap,
+      onTap: isDisabled ? null : onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: isDisabled
+              ? Theme.of(context).cardColor.withValues(alpha: 0.5)
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
@@ -134,7 +203,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 16),
+            Icon(icon, color: isDisabled ? AppColors.grey : AppColors.primary, size: 16),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -146,12 +215,20 @@ class _StatistikScreenState extends State<StatistikScreen> {
                     value,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bodyContext(context).copyWith(fontWeight: FontWeight.w600, fontSize: 12),
+                    style: AppTextStyles.bodyContext(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: isDisabled ? AppColors.grey : null,
+                    ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 16),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: isDisabled ? AppColors.grey : AppColors.primary,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -188,7 +265,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
                     setState(() {
                       _selectedMonth = month;
                     });
-                    context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+                    _loadData();
                     Navigator.pop(context);
                   },
                 );
@@ -220,7 +297,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
                 setState(() {
                   _selectedYear = year;
                 });
-                context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+                _loadData();
                 Navigator.pop(context);
               },
             );
@@ -230,17 +307,115 @@ class _StatistikScreenState extends State<StatistikScreen> {
     );
   }
 
+  Widget _buildJenisPicker(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Pilih Tipe', style: AppTextStyles.heading4Context(context)),
+          const SizedBox(height: 16),
+          ...['Semua', 'Pemasukan', 'Pengeluaran'].map((jenis) {
+            final value = jenis == 'Semua'
+                ? null
+                : (jenis == 'Pemasukan' ? TransaksiType.pemasukan : TransaksiType.pengeluaran);
+            return ListTile(
+              title: Text(jenis, style: AppTextStyles.bodyContext(context)),
+              trailing: _selectedJenis == value
+                  ? const Icon(Icons.check_circle, color: AppColors.primary)
+                  : null,
+              onTap: () {
+                setState(() {
+                  _selectedJenis = value;
+                  _selectedKategori = null;
+                });
+                Navigator.pop(context);
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKategoriPicker(BuildContext context) {
+    final kategoriProvider = context.watch<KategoriProvider>();
+    final listKategori = _selectedJenis == TransaksiType.pemasukan
+        ? kategoriProvider.listPemasukan
+        : kategoriProvider.listPengeluaran;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.6,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Pilih Kategori', style: AppTextStyles.heading4Context(context)),
+          const SizedBox(height: 16),
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: listKategori.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return ListTile(
+                    title: Text('Semua', style: AppTextStyles.bodyContext(context)),
+                    trailing: _selectedKategori == null
+                        ? const Icon(Icons.check_circle, color: AppColors.primary)
+                        : null,
+                    onTap: () {
+                      setState(() {
+                        _selectedKategori = null;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                }
+                final kategori = listKategori[index - 1];
+                final katIcon = iconFromName(kategori.icon);
+                return ListTile(
+                  leading: katIcon != null
+                      ? Icon(katIcon, color: Color(int.parse('FF${kategori.warna.replaceFirst('#', '')}', radix: 16)), size: 24)
+                      : Text(kategori.icon, style: const TextStyle(fontSize: 22)),
+                  title: Text(kategori.nama, style: AppTextStyles.bodyContext(context)),
+                  trailing: _selectedKategori == kategori.nama
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedKategori = kategori.nama;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildContent(BuildContext context) {
-    return Consumer<TransaksiProvider>(
-      builder: (context, provider, child) {
-        if (provider.isLoading) {
+    return Consumer2<TransaksiProvider, KategoriProvider>(
+      builder: (context, transaksiProvider, kategoriProvider, child) {
+        if (transaksiProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final pemasukan = provider.list
+        final filtered = _filterList(transaksiProvider.list);
+
+        final kategoriMap = <String, Kategori>{};
+        for (final k in kategoriProvider.list) {
+          kategoriMap[k.nama] = k;
+        }
+
+        final pemasukan = filtered
             .where((t) => t.tipe == TransaksiType.pemasukan)
             .fold(0, (sum, t) => sum + t.jumlah);
-        final pengeluaran = provider.list
+        final pengeluaran = filtered
             .where((t) => t.tipe == TransaksiType.pengeluaran)
             .fold(0, (sum, t) => sum + t.jumlah);
         final selisih = pemasukan - pengeluaran;
@@ -254,7 +429,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
               const SizedBox(height: 20),
               _buildChart(context, pemasukan, pengeluaran),
               const SizedBox(height: 20),
-              _buildDetailTransaksi(context, provider),
+              _buildDetailTransaksi(context, filtered, kategoriMap),
             ],
           ),
         );
@@ -437,13 +612,13 @@ class _StatistikScreenState extends State<StatistikScreen> {
     );
   }
 
-  Widget _buildDetailTransaksi(BuildContext context, TransaksiProvider provider) {
+  Widget _buildDetailTransaksi(BuildContext context, List<Transaksi> list, Map<String, Kategori> kategoriMap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Detail Transaksi', style: AppTextStyles.heading4Context(context)),
         const SizedBox(height: 12),
-        if (provider.list.isEmpty)
+        if (list.isEmpty)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -460,14 +635,27 @@ class _StatistikScreenState extends State<StatistikScreen> {
             ),
             child: Center(
               child: Text(
-                'Tidak ada transaksi di bulan ini',
+                'Tidak ada transaksi',
                 style: AppTextStyles.bodySmallContext(context),
               ),
             ),
           )
         else
-          ...provider.list.map(
-            (transaksi) => Container(
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.38,
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              children: list.map((transaksi) {
+              final kat = kategoriMap[transaksi.kategori];
+              final iconBg = kat != null
+                  ? Color(int.parse('FF${kat.warna.replaceFirst('#', '')}', radix: 16)).withValues(alpha: 0.15)
+                  : (transaksi.tipe == TransaksiType.pemasukan
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.error.withValues(alpha: 0.1));
+              return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
@@ -486,20 +674,20 @@ class _StatistikScreenState extends State<StatistikScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: transaksi.tipe == TransaksiType.pemasukan
-                          ? AppColors.success.withValues(alpha: 0.1)
-                          : AppColors.error.withValues(alpha: 0.1),
+                      color: iconBg,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      transaksi.tipe == TransaksiType.pemasukan
-                          ? Icons.arrow_downward
-                          : Icons.arrow_upward,
-                      color: transaksi.tipe == TransaksiType.pemasukan
-                          ? AppColors.success
-                          : AppColors.error,
-                      size: 14,
-                    ),
+                    child: kat?.icon != null
+                        ? _buildStatistikIcon(kat!.icon)
+                        : Icon(
+                            transaksi.tipe == TransaksiType.pemasukan
+                                ? Icons.arrow_downward
+                                : Icons.arrow_upward,
+                            color: transaksi.tipe == TransaksiType.pemasukan
+                                ? AppColors.success
+                                : AppColors.error,
+                            size: 14,
+                          ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -536,9 +724,25 @@ class _StatistikScreenState extends State<StatistikScreen> {
                   ),
                 ],
               ),
+            );
+            }).toList(),
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildStatistikIcon(String iconName) {
+    final iconData = iconFromName(iconName);
+    if (iconData != null) {
+      return Icon(iconData, size: 16);
+    }
+    return SizedBox(
+      width: 16, height: 16,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(iconName, style: const TextStyle(fontSize: 16)),
+      ),
     );
   }
 }

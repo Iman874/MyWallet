@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/transaksi_provider.dart';
+import '../providers/kategori_provider.dart';
 import '../widgets/sticky_header.dart';
 import '../widgets/transaksi_list_item.dart';
 import '../widgets/empty_state_widget.dart';
@@ -9,6 +10,7 @@ import '../widgets/notifikasi_badge.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/format.dart';
+import '../../domain/entities/kategori.dart';
 import 'tambah_transaksi_screen.dart';
 import 'detail_transaksi_screen.dart';
 import 'home_screen.dart';
@@ -30,10 +32,15 @@ class DashboardScreen extends StatelessWidget {
           ),
           // Scrollable Content
           Expanded(
-            child: Consumer<TransaksiProvider>(
-              builder: (context, provider, child) {
+            child: Consumer2<TransaksiProvider, KategoriProvider>(
+              builder: (context, provider, kategoriProvider, child) {
                 if (provider.isLoading && provider.list.isEmpty) {
                   return const SkeletonDashboard();
+                }
+
+                final kategoriMap = <String, Kategori>{};
+                for (final k in kategoriProvider.list) {
+                  kategoriMap[k.nama] = k;
                 }
 
                 return SingleChildScrollView(
@@ -49,7 +56,7 @@ class DashboardScreen extends StatelessWidget {
                         provider.ringkasanHarian['pengeluaran'] ?? 0,
                       ),
                       const SizedBox(height: 24),
-                      _buildTransaksiTerbaru(context, provider),
+                      _buildTransaksiTerbaru(context, provider, kategoriMap),
                     ],
                   ),
                 );
@@ -283,7 +290,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTransaksiTerbaru(BuildContext context, TransaksiProvider provider) {
+  Widget _buildTransaksiTerbaru(BuildContext context, TransaksiProvider provider, Map<String, Kategori> kategoriMap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -316,17 +323,29 @@ class DashboardScreen extends StatelessWidget {
             ),
           )
         else
-          ...provider.list.take(5).map(
-            (transaksi) => TransaksiListItem(
-              transaksi: transaksi,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DetailTransaksiScreen(transaksi: transaksi),
-                  ),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.38,
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              children: provider.list.take(5).map((transaksi) {
+                final kat = kategoriMap[transaksi.kategori];
+                return TransaksiListItem(
+                  transaksi: transaksi,
+                  categoryIcon: kat?.icon,
+                  categoryColor: kat != null ? Color(int.parse('FF${kat.warna.replaceFirst('#', '')}', radix: 16)) : null,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DetailTransaksiScreen(transaksi: transaksi),
+                      ),
+                    );
+                  },
                 );
-              },
+              }).toList(),
             ),
           ),
       ],

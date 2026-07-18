@@ -26,12 +26,12 @@ class AppColors {
   static const Color greyLight = Color(0xFFF1F5F9);
 
   // Dark theme colors
-  static const Color backgroundDark = Color(0xFF1E1E2E);
-  static const Color cardDark = Color(0xFF2A2A3C);
-  static const Color borderDark = Color(0xFF3A3A4C);
+  static const Color backgroundDark = Color(0xFF0F0F18);
+  static const Color cardDark = Color(0xFF222238);
+  static const Color borderDark = Color(0xFF2E2E44);
   static const Color textPrimaryDark = Color(0xFFE2E8F0);
   static const Color textSecondaryDark = Color(0xFF94A3B8);
-  static const Color greyLightDark = Color(0xFF334155);
+  static const Color greyLightDark = Color(0xFF2E2E44);
 
   /// Get appropriate color based on theme brightness
   static Color forBrightness(BuildContext context, Color light, Color dark) =>

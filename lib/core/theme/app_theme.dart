@@ -81,9 +81,9 @@ class AppTheme {
         brightness: Brightness.dark,
         primary: AppColors.primaryLight,
         error: AppColors.error,
-        surface: const Color(0xFF1E1E2E),
+        surface: AppColors.cardDark,
       ),
-      scaffoldBackgroundColor: const Color(0xFF1E1E2E),
+      scaffoldBackgroundColor: AppColors.backgroundDark,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
@@ -91,7 +91,7 @@ class AppTheme {
         centerTitle: true,
       ),
       cardTheme: CardThemeData(
-        color: const Color(0xFF2A2A3C),
+        color: AppColors.cardDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -114,14 +114,14 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF2A2A3C),
+        fillColor: AppColors.cardDark,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3A3A4C)),
+          borderSide: const BorderSide(color: AppColors.borderDark),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3A3A4C)),
+          borderSide: const BorderSide(color: AppColors.borderDark),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
