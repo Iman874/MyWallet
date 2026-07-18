@@ -1,16 +1,60 @@
-# uangku
+# 💰 UangKu — Pencatatan Keuangan Pribadi
 
-A new Flutter project.
+> **[🇬🇧 English](./README_EN.md)** | **[🇮🇩 Bahasa Indonesia](./README_ID.md)**
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+**Personal finance tracker app** built with **Flutter (Dart)** and **local SQLite** — *offline-first*, no backend required.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+**Aplikasi pencatatan keuangan pribadi** berbasis **Flutter (Dart)** dengan **SQLite lokal** — *offline-first*, tanpa backend.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🚀 Quick Start
+
+```powershell
+# Pastikan Flutter SDK terinstall
+flutter doctor
+
+# Ambil dependency
+flutter pub get
+
+# Jalankan aplikasi (mode debug)
+flutter run
+```
+
+> 📖 Panduan lengkap → [`how_to_run.md`](./how_to_run.md)
+
+---
+
+## 📸 Preview Aplikasi
+
+Tangkapan layar (screenshot) antarmuka UangKu tersimpan di folder:
+
+> 🗂️ **`D:\Iman874\Documents\Github\ai-agent-hybrid`**
+
+| Tampilan | File | Keterangan |
+|---|---|---|
+| Dasbor Keuangan | `uangku-dashboard.png` | Saldo terkini, ringkasan harian, transaksi terbaru |
+| Catat Transaksi | `uangku-tambah.png` | Form pemasukan / pengeluaran |
+| Riwayat | `uangku-riwayat.png` | Daftar & filter transaksi bulanan |
+| Statistik | `uangku-statistik.png` | Pie chart komposisi pengeluaran per kategori |
+| Splash Screen | `uangku-splash.png` | Animated wallet logo & coin animation |
+
+---
+
+## 🔖 Versi Terkini
+
+| Version | Name | Status |
+|---|---|---|
+| `v0.9` | Fitur Portofolio | ✅ **Implemented** — Ekspor/Impor, Pie Chart, Budget Kategori |
+| `v0.8` | Splash Screen | ✅ **Implemented** — Animated wallet logo & coin animation |
+| `v0.7` | Detail & Toast | ✅ **Implemented** — Lihat detail, edit penuh, toast notification |
+
+---
+
+## 📄 License
+
+Private project — not for public distribution.
