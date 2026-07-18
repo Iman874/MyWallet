@@ -83,6 +83,10 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
+  bool _isDark(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,14 +96,19 @@ class _SplashScreenState extends State<SplashScreen>
           return Opacity(
             opacity: _fadeAnimation.value,
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment.center,
                   radius: 1.5,
-                  colors: [
-                    Color(0xFFFFFFFF),
-                    Color(0xFFF6F8FC),
-                  ],
+                  colors: _isDark(context)
+                      ? [
+                          const Color(0xFF0F0F18),
+                          const Color(0xFF1A1A2E),
+                        ]
+                      : [
+                          const Color(0xFFFFFFFF),
+                          const Color(0xFFF6F8FC),
+                        ],
                 ),
               ),
               child: Stack(
@@ -143,7 +152,9 @@ class _SplashScreenState extends State<SplashScreen>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.withValues(alpha: 0.5),
+                        color: _isDark(context)
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : Colors.grey.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
