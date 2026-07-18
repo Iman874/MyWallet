@@ -70,7 +70,7 @@ Detail:
 - Format mengikuti repo referensi D:\Iman874\Documents\Github\ai-agent-hybrid (badge bahasa EN/ID, Feature Highlights, Tech Stack, Quick Start, Project Structure, Release History, License)
 - 4 file: README.md (ringkas bilingual), README_EN.md (detail EN), README_ID.md (detail ID), how_to_run.md
 - Versi terkini app sudah v0.9 (bukan v0.3) — semua fitur v0.1–v0.9 didokumentasikan (Foundation, Dashboard, Riwayat, Modern UI, Stats/Kategori, Detail/Notif, Detail/Toast, Splash, Portfolio)
-- Bagian khusus Preview Aplikasi di semua file menunjuk ke folder `preview/` (root project MyWallet, BUKAN ai-agent-hybrid), format .jpeg, 8 layar: dashboard.jpeg, tambah.jpeg, riwayat.jpeg, statistik.jpeg, kategori.jpeg, pengaturan.jpeg, notifikasi.jpeg, splash.jpeg
+- Bagian khusus Preview Aplikasi di semua file menunjuk ke folder `preview/` (root project MyWallet), format .jpeg, prefix `uangku-`, 6 file asli: uangku-dashboard.jpeg, uangku-riwayat.jpeg, uangku-statistik.jpeg, uangku-category.jpeg, uangku-settings.jpeg, uangku-splash.jpeg (TIDAK ada tambah & notifikasi)
 - CATATAN PENTING: path preview adalah relatif terhadap repo MyWallet (D:\Iman874\Documents\Github\MyWallet\preview), jangan arahkan ke folder ai-agent-hybrid
 - Tech stack akurat: fl_chart, file_picker, DB v5, 56 test pass
 

@@ -35,16 +35,14 @@ Tangkapan layar (screenshot) antarmuka UangKu tersimpan di folder:
 
 > 🗂️ **`preview/`** (root project MyWallet)
 
-| Tampilan | File | Keterangan |
-|---|---|---|
-| Dasbor Keuangan | `preview/dashboard.jpeg` | Saldo terkini, ringkasan harian, transaksi terbaru |
-| Catat Transaksi | `preview/tambah.jpeg` | Form pemasukan / pengeluaran |
-| Riwayat | `preview/riwayat.jpeg` | Daftar & filter transaksi bulanan |
-| Statistik | `preview/statistik.jpeg` | Pie chart komposisi pengeluaran per kategori |
-| Kategori & Budget | `preview/kategori.jpeg` | Kategori custom + progress budget |
-| Pengaturan | `preview/pengaturan.jpeg` | Ekspor / impor data, tema |
-| Notifikasi | `preview/notifikasi.jpeg` | Peringatan batas & budget |
-| Splash Screen | `preview/splash.jpeg` | Animated wallet logo & coin animation |
+| Tampilan | File |
+|---|---|
+| Dasbor Keuangan | `preview/uangku-dashboard.jpeg` |
+| Riwayat | `preview/uangku-riwayat.jpeg` |
+| Statistik | `preview/uangku-statistik.jpeg` |
+| Kategori & Budget | `preview/uangku-category.jpeg` |
+| Pengaturan | `preview/uangku-settings.jpeg` |
+| Splash Screen | `preview/uangku-splash.jpeg` |
 
 ---
 

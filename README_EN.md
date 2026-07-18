@@ -64,16 +64,14 @@ Screenshots of the UangKu interface are stored in the folder:
 
 > 🗂️ **`preview/`** (MyWallet project root)
 
-| Screen | File | Description |
-|---|---|---|
-| Dashboard | `preview/dashboard.jpeg` | Current balance, daily summary, latest transactions |
-| Add Transaction | `preview/tambah.jpeg` | Income / expense form |
-| History | `preview/riwayat.jpeg` | Transaction list & monthly filter |
-| Statistics | `preview/statistik.jpeg` | Pie chart by category |
-| Categories & Budget | `preview/kategori.jpeg` | Custom categories + budget progress |
-| Settings | `preview/pengaturan.jpeg` | Export / import data, theme |
-| Notifications | `preview/notifikasi.jpeg` | Limit & budget alerts |
-| Splash | `preview/splash.jpeg` | Animated wallet logo & coin animation |
+| Screen | File |
+|---|---|
+| Dashboard | `preview/uangku-dashboard.jpeg` |
+| History | `preview/uangku-riwayat.jpeg` |
+| Statistics | `preview/uangku-statistik.jpeg` |
+| Categories & Budget | `preview/uangku-category.jpeg` |
+| Settings | `preview/uangku-settings.jpeg` |
+| Splash | `preview/uangku-splash.jpeg` |
 
 ---
 

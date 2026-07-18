@@ -94,14 +94,12 @@ Screenshot antarmuka UangKu tersimpan di folder:
 
 | Tampilan | File |
 |---|---|
-| Dasbor Keuangan | `preview/dashboard.jpeg` |
-| Catat Transaksi | `preview/tambah.jpeg` |
-| Riwayat | `preview/riwayat.jpeg` |
-| Statistik | `preview/statistik.jpeg` |
-| Kategori & Budget | `preview/kategori.jpeg` |
-| Pengaturan | `preview/pengaturan.jpeg` |
-| Notifikasi | `preview/notifikasi.jpeg` |
-| Splash Screen | `preview/splash.jpeg` |
+| Dasbor Keuangan | `preview/uangku-dashboard.jpeg` |
+| Riwayat | `preview/uangku-riwayat.jpeg` |
+| Statistik | `preview/uangku-statistik.jpeg` |
+| Kategori & Budget | `preview/uangku-category.jpeg` |
+| Pengaturan | `preview/uangku-settings.jpeg` |
+| Splash Screen | `preview/uangku-splash.jpeg` |
 
 ---
 
