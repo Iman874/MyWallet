@@ -187,15 +187,18 @@ void main() {
     });
 
     test('ringkasanHarian - should return daily summary', () async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
       await provider.add(Transaksi(
         jumlah: 100000,
-        tanggal: DateTime(2026, 7, 17, 10, 0),
+        tanggal: today.add(const Duration(hours: 10)),
         kategori: 'Gaji',
         tipe: TransaksiType.pemasukan,
       ));
       await provider.add(Transaksi(
         jumlah: 30000,
-        tanggal: DateTime(2026, 7, 17, 12, 0),
+        tanggal: today.add(const Duration(hours: 12)),
         kategori: 'Makan',
         tipe: TransaksiType.pengeluaran,
       ));
