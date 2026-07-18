@@ -1,5 +1,35 @@
 ==================================================
 Tanggal : 2026-07-18
+Waktu   : 23:00
+Kategori: Feature
+
+Judul:
+Icon kategori, filter statistik, grup tanggal riwayat, scroll terbatas
+
+Detail:
+- Dark mode fix: backgroundDark #1E1E2E→#0F0F18, cardDark #2A2A3C→#222238, border #3A3A4C→#2E2E44
+- Semua hardcoded old dark colors di app_theme.dart, home_screen.dart, tambah_transaksi_screen.dart diganti ke AppColors.*Dark
+- icon_mapper.dart: utility fungsi iconFromName() mapping string Material Icon → IconData Flutter (restaurant, directions_car, dll)
+- TransaksiListItem: tampilkan icon kategori sesuai database (Material icon atau emoji fallback), tanggal pindah baris sendiri
+- Dashboard, Riwayat, Statistik: lookup icon kategori via KategoriProvider + iconFromName
+- PengaturanScreen: card style konsisten (border radius 16, shadow halus), modal edit batas pakai formatCurrency
+- StatistikScreen: filter Tipe + Kategori (baris ke-2). Kategori disabled sampai Tipe dipilih. Data difilter client-side.
+- RiwayatScreen: grup transaksi per tanggal dengan header "Hari Ini" / "Kemarin" / formatted date + aksen garis biru
+- Dashboard & Statistik: transaksi terbaru/detail dibungkus ConstrainedBox(maxHeight: 38%) + ListView(shrinkWrap) agar scroll tidak terlalu jauh
+- flutter analyze: 0 error (1 info use_null_aware_elements di sticky_header)
+- flutter test: 50/50 pass
+
+Dampak:
+- Icon kategori muncul sesuai database (bukan arrow generic)
+- Dark mode punya kontras lebih baik
+- Statistik bisa filter by tipe + kategori
+- Riwayat lebih terstruktur dengan grup tanggal
+- Scroll card dibatasi sehingga halaman tidak scroll terlalu jauh
+- Modal edit batas pakai format rupiah
+- Commit: 0d0d20e
+==================================================
+==================================================
+Tanggal : 2026-07-18
 Waktu   : 17:30
 Kategori: Feature
 
