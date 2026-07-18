@@ -152,27 +152,36 @@ class _StatistikScreenState extends State<StatistikScreen> {
   Widget _buildMonthPicker(List<String> months) {
     return Container(
       padding: const EdgeInsets.all(20),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.6,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('Pilih Bulan', style: AppTextStyles.heading4),
           const SizedBox(height: 16),
-          ...List.generate(12, (index) {
-            final month = index + 1;
-            return ListTile(
-              title: Text(months[index]),
-              trailing: _selectedMonth == month
-                  ? const Icon(Icons.check_circle, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                setState(() {
-                  _selectedMonth = month;
-                });
-                context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
-                Navigator.pop(context);
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: 12,
+              itemBuilder: (context, index) {
+                final month = index + 1;
+                return ListTile(
+                  title: Text(months[index]),
+                  trailing: _selectedMonth == month
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedMonth = month;
+                    });
+                    context.read<TransaksiProvider>().loadByMonth(_selectedYear, _selectedMonth);
+                    Navigator.pop(context);
+                  },
+                );
               },
-            );
-          }),
+            ),
+          ),
         ],
       ),
     );

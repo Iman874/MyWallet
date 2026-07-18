@@ -38,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       height: 72,
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 40,
             offset: const Offset(0, 12),
           ),
@@ -93,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required int index,
   }) {
     final isSelected = _currentIndex == index;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
@@ -106,7 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFEAF2FF) : Colors.transparent,
+          color: isSelected
+              ? (isDark ? AppColors.primary.withValues(alpha: 0.2) : const Color(0xFFEAF2FF))
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -119,8 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(
                 isSelected ? activeIcon : icon,
                 color: isSelected
-                    ? const Color(0xFF4F7CFF)
-                    : const Color(0xFF8B95A7),
+                    ? AppColors.primary
+                    : (isDark ? Colors.grey : const Color(0xFF8B95A7)),
                 size: 22,
               ),
             ),
@@ -131,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? const Color(0xFF4F7CFF)
+                    ? AppColors.primary
                     : const Color(0xFF8B95A7),
               ),
             ),
