@@ -1,5 +1,44 @@
 ==================================================
 Tanggal : 2026-07-18
+Waktu   : 23:45
+Kategori: Refactor
+
+Judul:
+KonfirmasiDialog reusable & perbaikan dark mode riwayat
+
+Detail:
+- Dibuat widget KonfirmasiDialog (lib/presentation/widgets/konfirmasi_dialog.dart):
+  - Header: ikon lingkaran + judul (warna dinamis via confirmColor)
+  - Footer: Batal (outline) + Hapus/Simpan (filled)
+  - Pakai Theme.of(context).cardColor — otomatis ikut dark/light
+  - Support callback sync (onConfirm) dan async (onConfirmAsync)
+- Dipakai di: riwayat_screen & detail_transaksi_screen (ganti AlertDialog lama)
+- Filter dropdown riwayat: padding 14→12, radius 16→14, font label 11→10, value 13→12 (standarisasi)
+- Fix dark mode filter riwayat: caption/body static → captionContext/bodyContext
+- Splash screen gradient & teks versi ikut theme (light/dark)
+- flutter analyze: 0 error (1 info use_null_aware_elements)
+- Commit: 882bc64, f56f68a
+
+Dampak:
+- Delete dialog konsisten di semua halaman & theme-aware
+- Filter riwayat kompak & gelap mode benar
+==================================================
+==================================================
+Tanggal : 2026-07-18
+Waktu   : 23:30
+Kategori: Feature
+
+Judul:
+Launcher icon — ganti logo app
+
+Detail:
+- flutter_launcher_icons: ^0.14.3
+- Logo source: assets/logo/logo.png
+- Android & iOS icons auto-generated
+- Commit: 1638965
+==================================================
+==================================================
+Tanggal : 2026-07-18
 Waktu   : 23:00
 Kategori: Feature
 
