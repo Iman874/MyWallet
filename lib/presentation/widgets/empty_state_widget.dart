@@ -38,14 +38,16 @@ class EmptyStateWidget extends StatelessWidget {
             Text(
               title,
               style: AppTextStyles.heading4.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: AppTextStyles.bodySmall,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

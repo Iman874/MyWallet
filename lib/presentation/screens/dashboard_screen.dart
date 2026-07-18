@@ -14,7 +14,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           // Sticky Header
@@ -24,12 +24,12 @@ class DashboardScreen extends StatelessWidget {
             trailing: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FB),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.notifications_outlined,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 size: 22,
               ),
             ),
@@ -50,6 +50,7 @@ class DashboardScreen extends StatelessWidget {
                       _buildSaldoCard(provider.saldo),
                       const SizedBox(height: 24),
                       _buildRingkasanHarian(
+                        context,
                         provider.ringkasanHarian['pemasukan'] ?? 0,
                         provider.ringkasanHarian['pengeluaran'] ?? 0,
                       ),
@@ -184,16 +185,22 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRingkasanHarian(int pemasukan, int pengeluaran) {
+  Widget _buildRingkasanHarian(BuildContext context, int pemasukan, int pengeluaran) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Ringkasan Hari Ini', style: AppTextStyles.heading4),
+        Text(
+          'Ringkasan Hari Ini',
+          style: AppTextStyles.heading4.copyWith(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+        ),
         const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: _buildSummaryItem(
+                context: context,
                 label: 'Pemasukan',
                 amount: pemasukan,
                 icon: Icons.arrow_downward,
@@ -203,6 +210,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSummaryItem(
+                context: context,
                 label: 'Pengeluaran',
                 amount: pengeluaran,
                 icon: Icons.arrow_upward,
@@ -216,6 +224,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildSummaryItem({
+    required BuildContext context,
     required String label,
     required int amount,
     required IconData icon,
@@ -224,11 +233,11 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -269,18 +278,23 @@ class DashboardScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Transaksi Terbaru', style: AppTextStyles.heading4),
+        Text(
+          'Transaksi Terbaru',
+          style: AppTextStyles.heading4.copyWith(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+        ),
         const SizedBox(height: 16),
         if (provider.list.isEmpty)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

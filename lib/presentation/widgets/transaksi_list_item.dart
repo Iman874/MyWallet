@@ -31,11 +31,11 @@ class TransaksiListItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -54,7 +54,10 @@ class TransaksiListItem extends StatelessWidget {
         ),
         title: Text(
           transaksi.kategori,
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+          style: AppTextStyles.body.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,14 +65,16 @@ class TransaksiListItem extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               DateFormat('dd MMM yyyy').format(transaksi.tanggal),
-              style: AppTextStyles.caption,
+              style: AppTextStyles.caption.copyWith(
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
             ),
             if (transaksi.catatan != null && transaksi.catatan!.isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(
                 transaksi.catatan!,
                 style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

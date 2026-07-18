@@ -32,7 +32,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           // Sticky Header
@@ -42,12 +42,12 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             trailing: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FB),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.calendar_today_outlined,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 size: 22,
               ),
             ),
